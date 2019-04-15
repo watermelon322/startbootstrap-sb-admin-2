@@ -11510,6 +11510,7 @@ a:focus {
 
 .pagebar > .pagebar-tabs > .pagebar-leftward:hover,
 .pagebar > .pagebar-tabs > .pagebar-rightward:hover,
+.pagebar > .pagebar-tabs .pagebar-tab-item.active,
 .pagebar > .pagebar-tabs .pagebar-tab-item:hover {
   background: #f6f6f6;
 }
