@@ -10573,7 +10573,6 @@ a:focus {
 }
 
 #wrapper #content-wrapper {
-  background-color: #f8f9fc;
   width: 100%;
   overflow-x: hidden;
 }
@@ -10829,6 +10828,46 @@ a:focus {
 
 .border-left-danger {
   border-left: 0.25rem solid #e74a3b !important;
+}
+
+.border-right-primary {
+  border-right: 0.25rem solid #4e73df !important;
+}
+
+.border-right-success {
+  border-right: 0.25rem solid #1cc88a !important;
+}
+
+.border-right-info {
+  border-right: 0.25rem solid #36b9cc !important;
+}
+
+.border-right-warning {
+  border-right: 0.25rem solid #f6c23e !important;
+}
+
+.border-right-danger {
+  border-right: 0.25rem solid #e74a3b !important;
+}
+
+.border-top-primary {
+  border-top: 0.25rem solid #4e73df !important;
+}
+
+.border-top-success {
+  border-top: 0.25rem solid #1cc88a !important;
+}
+
+.border-top-info {
+  border-top: 0.25rem solid #36b9cc !important;
+}
+
+.border-top-warning {
+  border-top: 0.25rem solid #f6c23e !important;
+}
+
+.border-top-danger {
+  border-top: 0.25rem solid #e74a3b !important;
 }
 
 .border-bottom-primary {
