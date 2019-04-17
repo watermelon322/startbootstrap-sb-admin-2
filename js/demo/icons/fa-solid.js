@@ -1,11 +1,14 @@
-var wm = wm || {};
-wm.iconfonts = wm.iconfonts || {};
-wm.iconfonts.fontawesome = wm.iconfonts.fontawesome || {};
-wm.iconfonts.fontawesome.solid = {
-    name: 'solid',
+var WM = WM || {};
+WM.IconFonts = WM.IconFonts || {};
+WM.IconFonts.FontAwesome = WM.IconFonts.FontAwesome || {};
+WM.IconFonts.FontAwesome.Solid = {
+    name: 'Solid',
     cls: 'fas',
     excls: 'fa-fw',
     prefix: 'fa-',
+    css: 'vendor/fontawesome-free/css/all.min.css',
+    js: '',
+    mode: 'fontclass',
     icons: [
         'ad',
         'address-book',

@@ -1,11 +1,14 @@
-var wm = wm || {};
-wm.iconfonts = wm.iconfonts || {};
-wm.iconfonts.fontawesome = wm.iconfonts.fontawesome || {};
-wm.iconfonts.fontawesome.brands = {
-    name: 'brands',
+var WM = WM || {};
+WM.IconFonts = WM.IconFonts || {};
+WM.IconFonts.FontAwesome = WM.IconFonts.FontAwesome || {};
+WM.IconFonts.FontAwesome.Brands = {
+    name: 'Brands',
     cls: 'fab',
     excls: 'fa-fw',
     prefix: 'fa-',
+    css: 'vendor/fontawesome-free/css/all.min.css',
+    js: '',
+    mode: 'fontclass',
     icons: [
         '500px',
         'accessible-icon',

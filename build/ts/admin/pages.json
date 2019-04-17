@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "target": "ES2015",
+        "module": "amd",
+        "strict": true,
+        "declaration": true,
+        "removeComments": true
+    },
+    "include": [
+        "interfaces.ts",
+        "pages/**/*.ts"
+    ]
+}

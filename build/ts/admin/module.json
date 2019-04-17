@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "ES2015",
+        "module": "amd",
+        "strict": true,
+        "declaration": true,
+        "outFile": "module.js",
+        "removeComments": true
+    },
+    "include": [
+        "../wm.ts",
+        "**/*.ts"
+    ],
+    "exclude": [
+        "framework.ts"
+    ]
+}
