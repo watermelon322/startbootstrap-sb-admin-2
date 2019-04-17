@@ -5,7 +5,8 @@
         "strict": true,
         "declaration": true,
         "outFile": "framework.js",
-        "removeComments": true
+        "removeComments": true,
+        "moduleResolution": "node"
     },
     "include": [
         "../wm.ts",

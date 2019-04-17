@@ -133,13 +133,13 @@ namespace WM {
 
         public get(member: string, error: boolean = false) {
             return TypeHelper.get(this._instance, member, error);
-        };
+        }
         public set(member: string, arg: any, error: boolean = false) {
             TypeHelper.set(this._instance, member, arg, error);
-        };
+        }
         public invoke(member: string, args: any[] | IArguments = [], error: boolean = false) {
             return TypeHelper.invoke(this._instance, member, args, error);
-        };
+        }
     }
 
     export namespace Proxy {

@@ -1,16 +1,77 @@
 namespace WM.Admin {
+    let Attributes = {
+        'Trigger': 'wm-trigger'
+    }
+    let Selectors = {
+        'Dialogs': {
+            'Logout': '#wmd-logout'
+        },
+        'Trigger': `[${Attributes.Trigger}]`
+    };
+
+    class FrameworkPageEventHandlers {
+        private _framework: IFrameworkPage;
+        public get Framework(): IFrameworkPage {
+            return this._framework;
+        }
+
+        constructor(framework: IFrameworkPage) {
+            this._framework = framework;
+        }
+
+        public onlogout(args: any): void {
+            alert(args);
+            $(Selectors.Dialogs.Logout).modal();
+        }
+    }
+
     export class FrameworkPage implements IFrameworkPage {
+
         private _modules: Array<ModulePageProxy>;
+
+        private _handlers: FrameworkPageEventHandlers;
+
         public get Modules(): Array<ModulePageProxy> {
             return this._modules;
         }
 
         constructor() {
+            let framework = this;
             this._modules = new Array<ModulePageProxy>();
+            this._handlers = new FrameworkPageEventHandlers(framework);
+
+            $(Selectors.Trigger).each(function () {
+                framework.bindTrigger($(this));
+            });
         }
 
-        public logout(): void {
-            ($('#logoutModal') as any).modal();
+        public trigger(event: string | JQuery.Event, extraParameters?: any[] | JQuery.PlainObject | string | number | boolean) {
+            $(this._handlers).trigger(event, extraParameters);
+        }
+
+        public logout(args?: any): void {
+            this.trigger('logout', args);
+        }
+
+        private bindTrigger(elem: JQuery<HTMLElement>, trigger?: string, event?: string): void {
+            if (trigger == undefined || trigger == '') {
+                trigger = elem.attr(Attributes.Trigger);
+            }
+            trigger = $.trim(trigger || '');
+            if (trigger == '' || trigger == ':') return;
+
+            event = $.trim(event || '');
+            if (trigger.indexOf(':') >= 0) {
+                let temp = trigger.split(':', 2);
+                trigger = temp[1] != '' ? temp[1] : temp[0];
+                if (event == '')
+                    event = temp[0] != '' ? temp[0] : temp[1];
+            }
+
+            elem.on(event, (e) => {
+                delete e.type;
+                this.trigger(new jQuery.Event(trigger as string, e));
+            });
         }
     }
 
@@ -50,14 +111,14 @@ namespace WM.Admin {
             $("body").toggleClass("sidebar-toggled");
             $(".sidebar").toggleClass("toggled");
             if ($(".sidebar").hasClass("toggled")) {
-                ($('.sidebar .collapse') as any).collapse('hide');
+                $('.sidebar .collapse').collapse('hide');
             }
         });
 
         // Close any open menu accordions when window is resized below 768px
         $(window).resize(function () {
             if ($(window).width() as number < 768) {
-                ($('.sidebar .collapse') as any).collapse('hide');
+                $('.sidebar .collapse').collapse('hide');
             }
 
             fixPagefrm();

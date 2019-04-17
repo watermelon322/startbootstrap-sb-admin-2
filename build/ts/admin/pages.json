@@ -4,7 +4,8 @@
         "module": "amd",
         "strict": true,
         "declaration": true,
-        "removeComments": true
+        "removeComments": true,
+        "moduleResolution": "node"
     },
     "include": [
         "interfaces.ts",
