@@ -1,7 +1,7 @@
 namespace WM.Admin {
     export interface IFrameworkPage {
         readonly Modules: Array<IModulePage>;
-        logout(args?: any): void;
+        logout(): void;
     }
     export interface IModulePage {
         readonly Framework: IFrameworkPage;

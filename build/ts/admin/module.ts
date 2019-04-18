@@ -28,8 +28,8 @@ namespace WM.Admin {
             super(framework);
         }
 
-        public logout(args?: any): void {
-            this.Real.invoke('logout', args);
+        public logout(): void {
+            this.Real.invoke('logout', arguments);
         }
     }
 

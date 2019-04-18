@@ -19,8 +19,7 @@ namespace WM.Admin {
             this._framework = framework;
         }
 
-        public onlogout(args: any): void {
-            alert(args);
+        public onlogout(event: JQuery.Event): void {
             $(Selectors.Dialogs.Logout).modal();
         }
     }
@@ -49,8 +48,8 @@ namespace WM.Admin {
             $(this._handlers).trigger(event, extraParameters);
         }
 
-        public logout(args?: any): void {
-            this.trigger('logout', args);
+        public logout(): void {
+            this.trigger('logout', arguments);
         }
 
         private bindTrigger(elem: JQuery<HTMLElement>, trigger?: string, event?: string): void {
