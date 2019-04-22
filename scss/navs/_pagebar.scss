@@ -1,0 +1,94 @@
+.pagebar {
+  background: #fff;
+  border: 1px solid $border-color;
+  border-left: 0;
+  border-right: 0;
+
+  > .pagebar-tabs {
+    > .pagebar-leftward,
+    > .pagebar-rightward {
+      line-height: 3rem;
+      width: 3rem;
+      text-align: center;
+      display: none;
+      cursor: pointer;
+    }
+
+    > .pagebar-leftward {
+      float: left;
+    }
+
+    > .pagebar-rightward {
+      float: right;
+    }
+
+    > .pagebar-tab {
+      height: 3rem;
+      border: 1px solid $border-color;
+      border-top: 0;
+      border-bottom: 0;
+      overflow: hidden;
+    }
+
+    .pagebar-tab-items {
+      position: relative;
+      white-space: nowrap;
+    }
+
+    .pagebar-tab-item {
+      position: relative;
+      display: inline-block;
+      line-height: 3rem;
+      padding: 0 1rem;
+      border-right: 1px solid $border-color;
+      cursor: pointer;
+
+      .pagebar-title {
+        margin-left: 0.2rem;
+      }
+
+      .pagebar-close {
+        font-size: 0.5rem;
+        margin-left: 0.5rem;
+
+        &:hover {
+          color: red;
+        }
+      }
+    }
+
+    > .pagebar-leftward:hover,
+    > .pagebar-rightward:hover,
+    .pagebar-tab-item.active,
+    .pagebar-tab-item:hover {
+      background: #f6f6f6;
+    }
+  }
+
+  > .pagebar-tabs.morepage {
+    > .pagebar-leftward,
+    > .pagebar-rightward {
+      display: block;
+    }
+
+    > .pagebar-tab {
+      margin: 0 3rem;
+    }
+  }
+}
+
+.pagefrm {
+  overflow: hidden;
+
+  > iframe {
+    border: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    background: #fff;
+
+    &.active {
+      display: block;
+    }
+  }
+}
