@@ -37,12 +37,14 @@
     "datatables.net-bs4": "1.10.19",
     "jquery": "3.3.1",
     "jquery-slimscroll": "^1.3.8",
-    "jquery.easing": "^1.4.1"
+    "jquery.easing": "^1.4.1",
+    "lodash": "^4.17.11"
   },
   "devDependencies": {
     "@types/bootstrap": "^4.3.0",
     "@types/jquery": "^3.3.29",
     "@types/jquery.slimscroll": "^1.3.31",
+    "@types/lodash": "^4.14.123",
     "browser-sync": "2.26.3",
     "del": "4.0.0",
     "gulp": "4.0.0",

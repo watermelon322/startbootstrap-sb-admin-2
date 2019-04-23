@@ -47,6 +47,9 @@ function modules() {
     './node_modules/datatables.net-bs4/css/*.css'
   ])
     .pipe(gulp.dest('./vendor/datatables'));
+  // lodash
+  var lodash = gulp.src(['./node_modules/lodash/lodash.js', './node_modules/lodash/lodash.min.js'])
+    .pipe(gulp.dest('./vendor/lodash'));
   // Font Awesome
   var fontAwesome = gulp.src('./node_modules/@fortawesome/**/*')
     .pipe(gulp.dest('./vendor'));
@@ -62,7 +65,7 @@ function modules() {
     '!./node_modules/jquery/dist/core.js'
   ])
     .pipe(gulp.dest('./vendor/jquery'));
-  return merge(bootstrapJS, bootstrapSCSS, chartJS, dataTables, fontAwesome, jquery, jqueryEasing, jquerySlimscroll);
+  return merge(bootstrapJS, bootstrapSCSS, chartJS, dataTables, lodash, fontAwesome, jquery, jqueryEasing, jquerySlimscroll);
 }
 
 // CSS task

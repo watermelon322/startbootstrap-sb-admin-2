@@ -30,7 +30,7 @@
       overflow: hidden;
     }
 
-    .pagebar-tab-items {
+    .pagebar-tab-container {
       position: relative;
       white-space: nowrap;
     }
@@ -54,6 +54,24 @@
         &:hover {
           color: red;
         }
+      }
+
+      &:after {
+        position: absolute;
+        left: 0;
+        top: 0;
+        content: '';
+        width: 0;
+        height: 3px;
+        background: #4e73df;
+        border-radius: 2px 2px 0 0;
+        box-sizing: border-box;
+        pointer-events: none;
+        transition: all .3s;
+      }
+      &.active:after,
+      &:hover:after {
+        width: 100%;
       }
     }
 
