@@ -10,6 +10,9 @@ namespace WM.Admin {
         'pagebar': {
             'leftward': 'pagebar-leftward',
             'rightward': 'pagebar-rightward',
+            'tabs': 'pagebar-tabs',
+            'tab': 'pagebar-tab',
+            'morepage': 'morepage',
             'container': 'pagebar-tab-container',
             'item': 'pagebar-tab-item',
             'itemTitle': 'pagebar-title',
@@ -38,6 +41,8 @@ namespace WM.Admin {
         'pagebar': {
             'leftward': `.${ClassNames.pagebar.leftward}`,
             'rightward': `.${ClassNames.pagebar.rightward}`,
+            'tabs': `.${ClassNames.pagebar.tabs}`,
+            'tab': `.${ClassNames.pagebar.tab}`,
             'container': `.${ClassNames.pagebar.container}`,
             'items': `.${ClassNames.pagebar.container} > .${ClassNames.pagebar.item}`,
             'itemClose': `.${ClassNames.pagebar.container} > .${ClassNames.pagebar.item} > .${ClassNames.pagebar.itemClose}`
@@ -70,8 +75,14 @@ namespace WM.Admin {
 
         private _handlers: FrameworkPageEventHandlers;
 
+        public get ActivedModule(): ModulePageProxy | undefined {
+            return _.find(this.Modules, function (m) { return m.IsActive; });
+        }
         public get Modules(): Array<ModulePageProxy> {
             return this._modules;
+        }
+        public get AllModuleBarWidth(): number {
+            return _.sumBy(this.Modules, function (o) { return o.BarWidth; })
         }
 
         constructor() {
@@ -84,11 +95,12 @@ namespace WM.Admin {
             });
 
             // clear pagebar-tab-container space
-            let tmpElem = $(`${Selectors.layout.pagebar} ${Selectors.pagebar.container}`);
-            tmpElem.html($.trim(tmpElem.html()));
-
+            let pagebarContainer = $(`${Selectors.layout.pagebar} ${Selectors.pagebar.container}`);
+            let pagefrm = $(Selectors.layout.pagefrm);
             let pagefrmItems = $(`${Selectors.layout.pagefrm} > iframe`);
             let pagebarItems = $(`${Selectors.layout.pagebar} ${Selectors.pagebar.items}`);
+            pagebarContainer.empty();
+            pagefrm.empty();
             let count = Math.max(pagefrmItems.length, pagebarItems.length);
             if (count > 0) {
                 for (let index = 0; index < count; index++) {
@@ -97,12 +109,14 @@ namespace WM.Admin {
                     let pagebarItem: JQuery | undefined = undefined;
                     if (pagefrmItems.length > index) {
                         pagefrmItem = $(pagefrmItems[index]);
+                        pagefrm.append(pagefrmItem);
                         options.wmkey = pagefrmItem.attr(Attributes.WM.key) || pagefrmItem.data(Attributes.WM.key);
                         options.icon = pagefrmItem.attr(Attributes.WM.icon) || pagefrmItem.data(Attributes.WM.icon);
                         options.url = pagefrmItem.attr('src');
                     }
                     if (pagebarItems.length > index) {
                         pagebarItem = $(pagebarItems[index]);
+                        pagebarContainer.append(pagebarItem);
                         options.wmkey = options.wmkey || pagebarItem.attr(Attributes.WM.key) || pagebarItem.data(Attributes.WM.key);
                         options.icon = options.icon || pagebarItem.attr(Attributes.WM.icon) || pagebarItem.data(Attributes.WM.icon) || pagebarItem.children('i:first').attr('class');
                         options.name = $.trim(pagebarItem.text());
@@ -232,8 +246,44 @@ namespace WM.Admin {
             $(Selectors.sidebar.left.scrollMenus).slimScroll({
                 height: (leftSidebarHeight - leftLogoHeight - fixedMenusHeight) + 'px'
             });
+            this.adjustPagebar();
         }
 
+        private adjustPagebar(module?: ModulePageProxy): void {
+            let pagebar = $(Selectors.layout.pagebar);
+            let pagebarTabs = pagebar.find(Selectors.pagebar.tabs);
+            let pagebarTab = pagebar.find(Selectors.pagebar.tab);
+            let pagebarContainer = pagebar.find(Selectors.pagebar.container);
+            let allpagebarItemWidth = this.AllModuleBarWidth;
+
+            pagebarTabs.addClass(ClassNames.pagebar.morepage);
+            let pagebarTabMinWidth = pagebarTab.width() || 0;
+            pagebarTabs.removeClass(ClassNames.pagebar.morepage);
+            let pagebarTabMaxWidth = pagebarTab.width() || 0;
+
+            if (pagebarTabMaxWidth > allpagebarItemWidth) {
+                pagebarContainer.css({ 'left': '' });
+            } else {
+                pagebarTabs.addClass(ClassNames.pagebar.morepage);
+                if (module == undefined) module = this.ActivedModule;
+                if (module == undefined) return;
+
+                let offsetLeft = parseFloat(pagebarContainer.css('left'));
+                offsetLeft = isNaN(offsetLeft) ? 0 : offsetLeft;
+                let moduleLeft = module.BarOffsetLeft;
+                let moduleRange = { 'left': moduleLeft + offsetLeft, 'right': moduleLeft + offsetLeft + module.BarWidth };
+                if (moduleRange.left < 0 || moduleRange.left > pagebarTabMinWidth
+                    || moduleRange.right < 0 || moduleRange.right > pagebarTabMinWidth) {
+                    let left = 0 - moduleRange.left;
+                    let right = pagebarTabMinWidth - moduleRange.right;
+                    if (Math.abs(left) < Math.abs(right))
+                        offsetLeft += left;
+                    else
+                        offsetLeft += right;
+                    pagebarContainer.css('left', offsetLeft + 'px');
+                }
+            }
+        }
         private activeModule(module?: ModulePageProxy): void {
             if (module == undefined) return;
             $.each(this.Modules, function (n, o) {
@@ -241,10 +291,11 @@ namespace WM.Admin {
                     o.inactive();
                 else module.active();
             });
+            this.adjustPagebar();
         }
         private closeModule(module?: ModulePageProxy): void {
             if (module == undefined || !module.Options.closable) return;
-            if (module.isActive && this.Modules.length > 1) {
+            if (module.IsActive && this.Modules.length > 1) {
                 let nextModule: ModulePageProxy | undefined;
                 let offset = _.indexOf(this.Modules, module);
                 if (offset + 1 == this.Modules.length)
@@ -255,6 +306,7 @@ namespace WM.Admin {
             }
             let modules = _.pull(this.Modules, module);
             module.close();
+            this.adjustPagebar();
         }
         private findModule(condition: string | JQuery | HTMLElement): ModulePageProxy | undefined {
 
@@ -289,7 +341,16 @@ namespace WM.Admin {
         public PagebarItem?: JQuery;
         public PagefrmItem?: JQuery;
 
-        public get isActive(): boolean {
+        public get BarWidth(): number {
+            return this.PagebarItem == undefined ? 0 : (this.PagebarItem.outerWidth(true) || 0);
+        }
+        public get BarOffsetLeft(): number {
+            if (this.PagebarItem == undefined) return 0;
+            let offset = this.PagebarItem.offset() as JQuery.Coordinates;
+            let parentOffset = this.PagebarItem.parent().offset() as JQuery.Coordinates;;
+            return offset.left - parentOffset.left;
+        }
+        public get IsActive(): boolean {
             if (this.PagebarItem && this.PagebarItem.hasClass(ClassNames.pagebar.itemActive))
                 return true;
             if (this.PagefrmItem && this.PagefrmItem.hasClass(ClassNames.pagefrm.itemActive))

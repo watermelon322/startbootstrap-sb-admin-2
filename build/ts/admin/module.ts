@@ -31,6 +31,9 @@ namespace WM.Admin {
         public logout(): void {
             this.Real.invoke('logout', arguments);
         }
+        open(options: IOpenOptions): void {
+            this.Real.invoke('open', arguments);
+        }
     }
 
     export var Module: ModulePage;
