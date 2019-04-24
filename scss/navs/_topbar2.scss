@@ -1,0 +1,21 @@
+@import "topbar.scss";
+
+.topbar {
+    .dropdown-list {
+        .dropdown-item {
+            border-left: 0;
+            border-right: 0;
+        }
+
+        #messagesContainer,
+        #alertsContainer {
+            >.dropdown-item:last-child {
+                border-bottom: none;
+            }
+        }
+
+        .dropdown-footer {
+            border-top: 1px solid $border-color;
+        }
+    }
+}

@@ -40,6 +40,10 @@ namespace WM.Admin {
             'pagebar': '#content > .pagebar',
             'pagefrm': '#content > .pagefrm'
         },
+        'topbar': {
+            'alertcenter': { 'alertsContainer': '#alertsContainer' },
+            'messagecenter': { 'messagesContainer': '#messagesContainer' }
+        },
         'sidebar': {
             'left': {
                 'logo': '#fixedLogo',
@@ -276,6 +280,12 @@ namespace WM.Admin {
                     return false;
                 });
 
+            $(Selectors.topbar.alertcenter.alertsContainer).slimScroll({
+                height: '250px'
+            });
+            $(Selectors.topbar.messagecenter.messagesContainer).slimScroll({
+                height: '250px'
+            });
             framework.fixSize();
         }
 
@@ -328,6 +338,9 @@ namespace WM.Admin {
             framework.activeModule(module);
         }
 
+        /**
+         * 修正框架iframe,Pagebar尺寸
+         */
         private fixSize(): void {
 
             let navbarHeight = $(Selectors.layout.navbar).outerHeight(true) as number;
@@ -344,6 +357,9 @@ namespace WM.Admin {
             this.adjustPagebar();
         }
 
+        /**
+         * Pagebar向左移动
+         */
         private leftwardPagebar(): void {
             let pagebar = $(Selectors.layout.pagebar);
             let pagebarTabs = pagebar.find(Selectors.pagebar.tabs);
@@ -361,6 +377,9 @@ namespace WM.Admin {
             let module = this.Modules[index];
             this.adjustPagebar(module, false);
         }
+        /**
+         * Pagebar向右移动
+         */
         private rightwardPagebar(): void {
             let pagebar = $(Selectors.layout.pagebar);
             let pagebarTabs = pagebar.find(Selectors.pagebar.tabs);
@@ -379,6 +398,11 @@ namespace WM.Admin {
             let module = this.Modules[index];
             this.adjustPagebar(module, true);
         }
+        /**
+         * 调整Pagebar偏移位置
+         * @param module 模块对象
+         * @param alignment 对齐方向，null：自动，true：向左对齐，false：向右对齐
+         */
         private adjustPagebar(module?: ModulePageProxy, alignment?: boolean): void {
             let pagebar = $(Selectors.layout.pagebar);
             let pagebarTabs = pagebar.find(Selectors.pagebar.tabs);
@@ -424,7 +448,7 @@ namespace WM.Admin {
                 let pagebarRightward = pagebarTabs.find(Selectors.pagebar.rightward);
                 if (offsetLeft >= 0) pagebarLeftward.addClass('disabled');
                 else pagebarLeftward.removeClass('disabled');
-                if (Math.round((offsetLeft + allPagebarItemWidth) * 100) <= Math.round(pagebarTabMinWidth * 100)) pagebarRightward.addClass('disabled');
+                if (Math.abs(offsetLeft + allPagebarItemWidth - pagebarTabMinWidth) <= 0.01) pagebarRightward.addClass('disabled');
                 else pagebarRightward.removeClass('disabled');
             }
         }

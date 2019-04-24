@@ -4,29 +4,31 @@
   border-left: 0;
   border-right: 0;
 
-  > .pagebar-tabs {
-    > .pagebar-leftward,
-    > .pagebar-rightward {
+  >.pagebar-tabs {
+
+    >.pagebar-leftward,
+    >.pagebar-rightward {
       line-height: 3rem;
       width: 3rem;
       text-align: center;
       display: none;
       cursor: pointer;
+
       &.disabled {
         cursor: not-allowed;
         color: $gray-200;
       }
     }
 
-    > .pagebar-leftward {
+    >.pagebar-leftward {
       float: left;
     }
 
-    > .pagebar-rightward {
+    >.pagebar-rightward {
       float: right;
     }
 
-    > .pagebar-tab {
+    >.pagebar-tab {
       height: 3rem;
       overflow: hidden;
     }
@@ -86,21 +88,22 @@
       }
     }
 
-    > .pagebar-leftward:not(.disabled):hover,
-    > .pagebar-rightward:not(.disabled):hover,
+    >.pagebar-leftward:not(.disabled):hover,
+    >.pagebar-rightward:not(.disabled):hover,
     .pagebar-tab-item.active,
     .pagebar-tab-item:hover {
       background: #f6f6f6;
     }
   }
 
-  > .pagebar-tabs.morepage {
-    > .pagebar-leftward,
-    > .pagebar-rightward {
+  >.pagebar-tabs.morepage {
+
+    >.pagebar-leftward,
+    >.pagebar-rightward {
       display: block;
     }
 
-    > .pagebar-tab {
+    >.pagebar-tab {
       margin: 0 3rem;
       border: 1px solid #e3e6f0;
       border-top: 0;
@@ -111,8 +114,10 @@
   .pagebar-menus {
     position: absolute;
     padding: 0.25rem 0rem;
-    border-radius: 0.5rem;
+    border: 1px solid #e3e6f0;
+    border-radius: 0.35rem;
     background-color: #fff;
+
     &.hide {
       display: none;
     }
@@ -121,10 +126,23 @@
       &:not(.divider) {
         padding: 0.25rem 1rem;
         cursor: pointer;
-        &:hover,
+        user-select: none;
+        color: #3a3b45;
+
         &.disabled {
           color: #bbb;
         }
+
+        &:not(.disabled):hover {
+          color: #2e2f37;
+          background-color: #f8f9fc;
+        }
+
+        &:not(.disabled):active {
+          color: #fff;
+          background-color: #4e73df;
+        }
+
         &.disabled {
           cursor: not-allowed;
         }
@@ -132,8 +150,8 @@
 
       &.divider {
         height: 1px;
-        margin: 0.1rem 1rem;
-        background: #ccc;
+        margin: 0.1rem 0rem;
+        background: #e3e6f0;
       }
     }
   }
@@ -142,7 +160,7 @@
 .pagefrm {
   overflow: hidden;
 
-  > iframe {
+  >iframe {
     border: 0;
     width: 100%;
     height: 100%;
