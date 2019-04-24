@@ -1,3 +1,5 @@
+/// <reference path="../wm.ts"/>
+
 namespace WM.Admin {
     let Attributes = {
         'WM': {
@@ -17,7 +19,14 @@ namespace WM.Admin {
             'item': 'pagebar-tab-item',
             'itemTitle': 'pagebar-title',
             'itemClose': 'pagebar-close',
-            'itemActive': 'active'
+            'itemActive': 'active',
+            'menus': {
+                'menu': 'pagebar-menus',
+                'refresh': 'refresh',
+                'closeSelf': 'closeSelf',
+                'closeOther': 'closeOther',
+                'closeAll': 'closeAll'
+            }
         },
         'pagefrm': {
             'itemActive': 'active'
@@ -45,7 +54,15 @@ namespace WM.Admin {
             'tab': `.${ClassNames.pagebar.tab}`,
             'container': `.${ClassNames.pagebar.container}`,
             'items': `.${ClassNames.pagebar.container} > .${ClassNames.pagebar.item}`,
-            'itemClose': `.${ClassNames.pagebar.container} > .${ClassNames.pagebar.item} > .${ClassNames.pagebar.itemClose}`
+            'itemClose': `.${ClassNames.pagebar.container} > .${ClassNames.pagebar.item} > .${ClassNames.pagebar.itemClose}`,
+            'menus': {
+                'menu': `.${ClassNames.pagebar.menus.menu}`,
+                'items': `.${ClassNames.pagebar.menus.menu} > .pagebar-menuitem`,
+                'refresh': `.${ClassNames.pagebar.menus.refresh}`,
+                'closeSelf': `.${ClassNames.pagebar.menus.closeSelf}`,
+                'closeOther': `.${ClassNames.pagebar.menus.closeOther}`,
+                'closeAll': `.${ClassNames.pagebar.menus.closeAll}`
+            }
         },
         'pagefrm': {},
         'dialogs': {
@@ -129,13 +146,16 @@ namespace WM.Admin {
             }
 
             // Close any open menu accordions when window is resized below 768px
-            $(window).resize(function () {
-                if ($(window).width() as number < 768) {
-                    $('.sidebar .collapse').collapse('hide');
-                }
+            $(window)
+                .on('resize', function () {
+                    if ($(window).width() as number < 768) {
+                        $('.sidebar .collapse').collapse('hide');
+                    }
 
-                framework.fixSize();
-            });
+                    framework.fixSize();
+                }).on('blur', function (e) {
+                    $(Selectors.pagebar.menus.menu).addClass('hide');
+                });;
 
             $(document)
                 .on('click', '#sidebarToggle, #sidebarToggleTop', function (e) {
@@ -144,6 +164,73 @@ namespace WM.Admin {
                     if ($('.sidebar').hasClass('toggled')) {
                         $('.sidebar .collapse').collapse('hide');
                     }
+                })
+                .on('click', '*', function (e) {
+                    $(Selectors.pagebar.menus.menu).addClass('hide');
+                })
+                .on('contextmenu', `${Selectors.layout.pagebar} ${Selectors.pagebar.container}`, function (e) {
+                    let that = $(this);
+                    let menuElem = $(Selectors.pagebar.menus.menu);
+                    $(Selectors.pagebar.menus.menu).removeClass('hide');
+                    let mw = <number>menuElem.outerWidth(true);
+                    let x = mw + e.pageX + 5;
+                    let dw = <number>$(document).width();
+                    if (x > dw) x = Math.max(5, dw - mw - 5);
+                    else x = e.pageX;
+                    menuElem.offset({ 'left': x, 'top': e.pageY });
+
+                    let target: JQuery | undefined = $(e.target);
+                    if (!target.is(Selectors.pagebar.items)) {
+                        if (!target.is(that))
+                            target = target.parent(Selectors.pagebar.items);
+                        else target = undefined;
+                    }
+                    let module = framework.findModule(target);
+                    if (module != undefined) {
+                        menuElem.data('module', module);
+                        menuElem.find(Selectors.pagebar.menus.refresh).removeClass('disabled');
+                        if (module.Options.closable)
+                            menuElem.find(Selectors.pagebar.menus.closeSelf).removeClass('disabled');
+                        else
+                            menuElem.find(Selectors.pagebar.menus.closeSelf).addClass('disabled');
+                        menuElem.find(Selectors.pagebar.menus.closeOther).removeClass('disabled');
+                    }
+                    else {
+                        menuElem.find(Selectors.pagebar.menus.refresh).addClass('disabled');
+                        menuElem.find(Selectors.pagebar.menus.closeSelf).addClass('disabled');
+                        menuElem.find(Selectors.pagebar.menus.closeOther).addClass('disabled');
+                        menuElem.data('module', undefined);
+                    }
+                    return false;
+                })
+                .on('click', `${Selectors.layout.pagebar} ${Selectors.pagebar.menus.items}:not(.disabled):not(.divider)`, function (e) {
+                    let that = $(this);
+                    let target: JQuery | undefined = $(e.target);
+                    if (!target.is(Selectors.pagebar.menus.menu)) {
+                        target = target.parent(Selectors.pagebar.menus.menu);
+                    }
+                    if (target == undefined || target.length <= 0) return;
+
+                    if (that.is(Selectors.pagebar.menus.closeAll)) {
+                        let modules = _.filter(framework.Modules, function (o) { return <boolean>o.Options.closable; });
+                        _.each(modules, function (o) { framework.closeModule(o); });
+                        return false;
+                    }
+
+                    let module = target.data('module') as ModulePageProxy | undefined;
+                    if (module == undefined) return;
+
+                    if (that.is(Selectors.pagebar.menus.refresh)) {
+                        framework.refreshModule(module);
+                    } else if (that.is(Selectors.pagebar.menus.closeSelf)) {
+                        framework.closeModule(module);
+                    } else if (that.is(Selectors.pagebar.menus.closeOther)) {
+                        let modules = _.filter(framework.Modules, function (o) {
+                            return module != o && <boolean>o.Options.closable;
+                        });
+                        _.each(modules, function (o) { framework.closeModule(o); });
+                    }
+                    return false;
                 })
                 .on('click', `${Selectors.layout.pagebar} ${Selectors.pagebar.leftward}:not(.disabled)`, function (e) {
                     framework.leftwardPagebar();
@@ -326,18 +413,18 @@ namespace WM.Admin {
                         offsetLeft += left;
                     else
                         offsetLeft += right;
-                    offsetLeft = Math.min(0, offsetLeft);
-                    offsetLeft = Math.max(pagebarTabMinWidth - allPagebarItemWidth, offsetLeft);
-                    if (offsetLeft >= 0)
-                        pagebarContainer.css('left', '');
-                    else
-                        pagebarContainer.css('left', offsetLeft + 'px');
                 }
+                offsetLeft = Math.min(0, offsetLeft);
+                offsetLeft = Math.max(pagebarTabMinWidth - allPagebarItemWidth, offsetLeft);
+                if (offsetLeft >= 0)
+                    pagebarContainer.css('left', '');
+                else
+                    pagebarContainer.css('left', offsetLeft + 'px');
                 let pagebarLeftward = pagebarTabs.find(Selectors.pagebar.leftward);
                 let pagebarRightward = pagebarTabs.find(Selectors.pagebar.rightward);
                 if (offsetLeft >= 0) pagebarLeftward.addClass('disabled');
                 else pagebarLeftward.removeClass('disabled');
-                if (Math.fround(offsetLeft + allPagebarItemWidth) <= Math.fround(pagebarTabMinWidth)) pagebarRightward.addClass('disabled');
+                if (Math.round((offsetLeft + allPagebarItemWidth) * 100) <= Math.round(pagebarTabMinWidth * 100)) pagebarRightward.addClass('disabled');
                 else pagebarRightward.removeClass('disabled');
             }
         }
@@ -367,7 +454,11 @@ namespace WM.Admin {
             else if (!active && nextModule) this.adjustPagebar(nextModule);
             else this.adjustPagebar();
         }
-        private findModule(condition: string | JQuery | HTMLElement): ModulePageProxy | undefined {
+        private refreshModule(module?: ModulePageProxy): void {
+            if (module == undefined) return;
+            module.refresh();
+        }
+        private findModule(condition: string | JQuery | HTMLElement | undefined): ModulePageProxy | undefined {
 
             let module: ModulePageProxy | undefined;
             if (!condition) return module;
@@ -450,6 +541,52 @@ namespace WM.Admin {
             if (this.PagefrmItem)
                 this.PagefrmItem.remove();
         }
+        public refresh(): void {
+            this.refreshMode1() || this.refreshMode2() || this.refreshMode3();
+        }
+        private refreshMode1(): boolean {
+            try {
+                this.renewReal();
+                this.Real.invoke('refresh', arguments, true);
+                return true;
+            } catch (error) {
+                Log.trace(error);
+                return false;
+            }
+        }
+        private refreshMode2(): boolean {
+            try {
+                if (this.PagefrmItem && this.PagefrmItem.length > 0) {
+                    let win = (this.PagefrmItem[0] as HTMLIFrameElement).contentWindow as Window;
+                    win.location.reload();
+                }
+                return true;
+            } catch (error) {
+                Log.trace(error);
+                return false;
+            }
+        }
+        private refreshMode3(): boolean {
+            try {
+                if (this.PagefrmItem && this.PagefrmItem.length > 0) {
+                    this.PagefrmItem.attr('src', this.PagefrmItem.attr('src') as string);
+                }
+                return true;
+            } catch (error) {
+                Log.trace(error);
+                return false;
+            }
+        }
+
+        private renewReal() {
+            if (!this.Real.Valid && this.PagefrmItem && this.PagefrmItem.length > 0) {
+                try {
+                    let pagefrmWin = (this.PagefrmItem[0] as HTMLIFrameElement).contentWindow as any;
+                    this.Real.renew(pagefrmWin.WM.Admin.Module);
+                }
+                catch (e) { Log.trace(e); }
+            }
+        }
 
         private createDom(): void {
             if (this.PagebarItem == undefined) {
@@ -476,10 +613,14 @@ namespace WM.Admin {
         }
     }
     export var Framework: FrameworkPage;
+    export var FrameworkFactory: () => FrameworkPage;
 }
 
 (function ($) {
     $(function () {
-        WM.Admin.Framework = new WM.Admin.FrameworkPage();
+        if (WM.Admin.FrameworkFactory)
+            WM.Admin.Framework = WM.Admin.FrameworkFactory();
+        else
+            WM.Admin.Framework = new WM.Admin.FrameworkPage();
     });
 })(jQuery); // End of use strict

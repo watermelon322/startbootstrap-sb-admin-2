@@ -60,6 +60,6 @@
     "gulp-typescript": "^5.0.1",
     "gulp-uglify": "3.0.2",
     "merge-stream": "^1.0.1",
-    "typescript": "^3.4.3"
+    "typescript": "^3.4.5"
   }
 }

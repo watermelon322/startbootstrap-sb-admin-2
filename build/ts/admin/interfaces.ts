@@ -6,6 +6,7 @@ namespace WM.Admin {
     }
     export interface IModulePage {
         readonly Framework: IFrameworkPage;
+        refresh(): void;
     }
     export interface IOpenOptions {
         url?: string;

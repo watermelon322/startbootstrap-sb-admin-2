@@ -1,3 +1,5 @@
+/// <reference path="../wm.ts"/>
+
 namespace WM.Admin {
     export class ModulePage implements IModulePage {
         private _framework: FrameworkPageProxy;
@@ -7,6 +9,34 @@ namespace WM.Admin {
 
         constructor(framework?: IFrameworkPage) {
             this._framework = new FrameworkPageProxy(framework);
+
+            // Scroll to top button appear
+            $(document).on('scroll', function () {
+                let scrollDistance = $(this).scrollTop() as number;
+                if (scrollDistance > 100) {
+                    $('.scroll-to-top').fadeIn();
+                } else {
+                    $('.scroll-to-top').fadeOut();
+                }
+            });
+
+            // Smooth scrolling using jQuery easing
+            $(document).on('click', 'a.scroll-to-top', function (e) {
+                let $anchor = $(this);
+                let selector = $anchor.attr('href');
+                if (selector) {
+                    let offset = $(selector).offset();
+                    if (offset)
+                        $('html, body').stop().animate({
+                            scrollTop: (offset.top)
+                        }, 1000, 'easeInOutExpo');
+                }
+                e.preventDefault();
+            });
+        }
+
+        public refresh(): void {
+            window.location.reload();
         }
     }
 
@@ -20,10 +50,7 @@ namespace WM.Admin {
                 try {
                     framework = (window.opener || window.parent).WM.Admin.Framework;
                 }
-                catch (e) {
-                    if (WM.debug)
-                        WM.Log.debug(e);
-                }
+                catch (e) { Log.trace(e); }
             }
             super(framework);
         }
@@ -31,39 +58,30 @@ namespace WM.Admin {
         public logout(): void {
             this.Real.invoke('logout', arguments);
         }
-        open(options: IOpenOptions): void {
+        public open(options: IOpenOptions): void {
             this.Real.invoke('open', arguments);
+        }
+
+        private renewReal() {
+            if (!this.Real.Valid && (window.opener || window.parent)) {
+                try {
+                    let framework = (window.opener || window.parent).WM.Admin.Framework;
+                    this.Real.renew(framework);
+                }
+                catch (e) { Log.trace(e); }
+            }
         }
     }
 
     export var Module: ModulePage;
+    export var ModuleFactory: () => ModulePage;
 }
 
 (function ($) {
-    WM.Admin.Module = new WM.Admin.ModulePage();
-
-    // Scroll to top button appear
-    $(document).on('scroll', function () {
-        let scrollDistance = $(this).scrollTop() as number;
-        if (scrollDistance > 100) {
-            $('.scroll-to-top').fadeIn();
-        } else {
-            $('.scroll-to-top').fadeOut();
-        }
+    $(function () {
+        if (WM.Admin.ModuleFactory)
+            WM.Admin.Module = WM.Admin.ModuleFactory();
+        else
+            WM.Admin.Module = new WM.Admin.ModulePage();
     });
-
-    // Smooth scrolling using jQuery easing
-    $(document).on('click', 'a.scroll-to-top', function (e) {
-        let $anchor = $(this);
-        let selector = $anchor.attr('href');
-        if (selector) {
-            let offset = $(selector).offset();
-            if (offset)
-                $('html, body').stop().animate({
-                    scrollTop: (offset.top)
-                }, 1000, 'easeInOutExpo');
-        }
-        e.preventDefault();
-    });
-
-})(jQuery);
+})(jQuery); // End of use strict

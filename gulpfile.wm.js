@@ -39,11 +39,6 @@ function minCss() {
         .pipe(gulp.dest(`${outputDest}/css`))
 }
 
-function cpPagesJs(target) {
-    console.info(`开始复制 pages/**/*.js ...`);
-    return gulp.src([`${inputSrc}/ts/admin/pages/**/*.js`])
-        .pipe(gulp.dest(`${outputDest}/js/wm/admin/pages`));
-}
 function pagesJs(target) {
     console.info(`开始生成 pages/**/*.js 目标:${target}...`);
     const project = typescript.createProject(`${inputSrc}/ts/admin/pages.json`, { target: target });
@@ -82,7 +77,7 @@ function minJs() {
 
 var cssDev = gulp.series(adminCss);
 var cssPro = gulp.series(cssDev, minCss);
-var js = target => gulp.series(() => frameworkJs(target), () => moduleJs(target), () => pagesJs(target), cpPagesJs);
+var js = target => gulp.series(() => frameworkJs(target), () => moduleJs(target), () => pagesJs(target));
 var jsDev = gulp.series(js('ES2015'), minJs);
 var jsPro = gulp.series(js('es5'), minJs);
 
@@ -92,7 +87,10 @@ var buildPro = gulp.series(clean, gulp.parallel(jsPro, cssPro));
 gulp.task('clean', clean);
 gulp.task('fwjs', () => frameworkJs('ES2015'));
 gulp.task('mjs', () => moduleJs('ES2015'));
-gulp.task('pjs', gulp.series(() => pagesJs('ES2015'), cpPagesJs));
+gulp.task('pjs', () => pagesJs('ES2015'));
+// gulp.task('fwjs_es5', () => frameworkJs('es5'));
+// gulp.task('mjs_es5', () => moduleJs('es5'));
+// gulp.task('pjs_es5', () => pagesJs('es5'));
 gulp.task('jsDev', jsDev);
 gulp.task('jsPro', jsPro);
 gulp.task('cssDev', cssDev);

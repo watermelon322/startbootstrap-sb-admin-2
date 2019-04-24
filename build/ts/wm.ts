@@ -131,6 +131,10 @@ namespace WM {
 
         constructor(instance?: T) { this._instance = instance; }
 
+        public renew(instance?: T): void {
+            this._instance = instance;
+        }
+
         public get(member: string, error: boolean = false) {
             return TypeHelper.get(this._instance, member, error);
         }
@@ -158,9 +162,3 @@ namespace WM {
         }
     }
 }
-
-Math.fround = Math.fround || (function (array) {
-    return function (x: any) {
-        return array[0] = x, array[0];
-    };
-})(new Float32Array(1));
