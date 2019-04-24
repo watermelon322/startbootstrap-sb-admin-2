@@ -41,7 +41,9 @@ function minCss() {
 
 function pagesJs(target) {
     console.info(`开始生成 pages/**/*.js 目标:${target}...`);
-    const project = typescript.createProject(`${inputSrc}/ts/admin/pages.json`, { target: target });
+    const project = typescript.createProject(`${inputSrc}/ts/admin/pages.json`, {
+        target: target
+    });
     return project.src()
         .pipe(project())
         .pipe(gulp.dest(`${outputDest}/js/wm/admin`));
@@ -49,7 +51,9 @@ function pagesJs(target) {
 
 function frameworkJs(target) {
     console.info(`开始生成 framework.js 目标:${target}...`);
-    const project = typescript.createProject(`${inputSrc}/ts/admin/framework.json`, { target: target });
+    const project = typescript.createProject(`${inputSrc}/ts/admin/framework.json`, {
+        target: target
+    });
     return project.src()
         .pipe(project())
         .pipe(gulp.dest(`${outputDest}/js/wm/admin`));
@@ -57,7 +61,9 @@ function frameworkJs(target) {
 
 function moduleJs(target) {
     console.info(`开始生成 module.js 目标:${target}...`);
-    const project = typescript.createProject(`${inputSrc}/ts/admin/module.json`, { target: target });
+    const project = typescript.createProject(`${inputSrc}/ts/admin/module.json`, {
+        target: target
+    });
     return project.src()
         .pipe(project())
         .pipe(gulp.dest(`${outputDest}/js/wm/admin`));
@@ -78,7 +84,7 @@ function minJs() {
 var cssDev = gulp.series(adminCss);
 var cssPro = gulp.series(cssDev, minCss);
 var js = target => gulp.series(() => frameworkJs(target), () => moduleJs(target), () => pagesJs(target));
-var jsDev = gulp.series(js('ES2015'), minJs);
+var jsDev = gulp.series(js('ES2015'));
 var jsPro = gulp.series(js('es5'), minJs);
 
 var buildDev = gulp.series(clean, gulp.parallel(jsDev, cssDev));
