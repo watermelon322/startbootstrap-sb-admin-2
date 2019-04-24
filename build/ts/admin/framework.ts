@@ -145,6 +145,14 @@ namespace WM.Admin {
                         $('.sidebar .collapse').collapse('hide');
                     }
                 })
+                .on('click', `${Selectors.layout.pagebar} ${Selectors.pagebar.leftward}:not(.disabled)`, function (e) {
+                    framework.leftwardPagebar();
+                    return false;
+                })
+                .on('click', `${Selectors.layout.pagebar} ${Selectors.pagebar.rightward}:not(.disabled)`, function (e) {
+                    framework.rightwardPagebar();
+                    return false;
+                })
                 .on('click', `${Selectors.layout.pagebar} ${Selectors.pagebar.itemClose}`, function (e) {
                     let module = framework.findModule($(this).parent());
                     framework.closeModule(module);
@@ -249,19 +257,54 @@ namespace WM.Admin {
             this.adjustPagebar();
         }
 
-        private adjustPagebar(module?: ModulePageProxy): void {
+        private leftwardPagebar(): void {
             let pagebar = $(Selectors.layout.pagebar);
             let pagebarTabs = pagebar.find(Selectors.pagebar.tabs);
-            let pagebarTab = pagebar.find(Selectors.pagebar.tab);
-            let pagebarContainer = pagebar.find(Selectors.pagebar.container);
-            let allpagebarItemWidth = this.AllModuleBarWidth;
+            let pagebarTab = pagebarTabs.find(Selectors.pagebar.tab);
+            let pagebarContainer = pagebarTabs.find(Selectors.pagebar.container);
+            let allPagebarItemWidth = this.AllModuleBarWidth;
+            let pagebarTabWidth = pagebarTab.width() || 0;
+
+            let position = parseFloat(pagebarContainer.css('left'));
+            position = isNaN(position) ? 0 : Math.abs(position);
+
+            let index = _.findLastIndex(this.Modules, function (o) {
+                return o.BarOffsetLeft <= position;
+            });
+            let module = this.Modules[index];
+            this.adjustPagebar(module, false);
+        }
+        private rightwardPagebar(): void {
+            let pagebar = $(Selectors.layout.pagebar);
+            let pagebarTabs = pagebar.find(Selectors.pagebar.tabs);
+            let pagebarTab = pagebarTabs.find(Selectors.pagebar.tab);
+            let pagebarContainer = pagebarTabs.find(Selectors.pagebar.container);
+            let allPagebarItemWidth = this.AllModuleBarWidth;
+            let pagebarTabWidth = pagebarTab.width() || 0;
+
+            let position = parseFloat(pagebarContainer.css('left'));
+            position = isNaN(position) ? 0 : Math.abs(position);
+            position += pagebarTabWidth;
+
+            let index = _.findIndex(this.Modules, function (o) {
+                return o.BarOffsetLeft + o.BarWidth >= position;
+            });
+            let module = this.Modules[index];
+            this.adjustPagebar(module, true);
+        }
+        private adjustPagebar(module?: ModulePageProxy, alignment?: boolean): void {
+            let pagebar = $(Selectors.layout.pagebar);
+            let pagebarTabs = pagebar.find(Selectors.pagebar.tabs);
+            let pagebarTab = pagebarTabs.find(Selectors.pagebar.tab);
+            let pagebarContainer = pagebarTabs.find(Selectors.pagebar.container);
+            let allPagebarItemWidth = this.AllModuleBarWidth;
 
             pagebarTabs.addClass(ClassNames.pagebar.morepage);
             let pagebarTabMinWidth = pagebarTab.width() || 0;
             pagebarTabs.removeClass(ClassNames.pagebar.morepage);
             let pagebarTabMaxWidth = pagebarTab.width() || 0;
 
-            if (pagebarTabMaxWidth > allpagebarItemWidth) {
+            if (pagebarTabMaxWidth > allPagebarItemWidth) {
                 pagebarContainer.css({ 'left': '' });
             } else {
                 pagebarTabs.addClass(ClassNames.pagebar.morepage);
@@ -276,12 +319,26 @@ namespace WM.Admin {
                     || moduleRange.right < 0 || moduleRange.right > pagebarTabMinWidth) {
                     let left = 0 - moduleRange.left;
                     let right = pagebarTabMinWidth - moduleRange.right;
-                    if (Math.abs(left) < Math.abs(right))
+                    if (TypeHelper.getType(alignment) != "boolean") {
+                        alignment = Math.abs(left) < Math.abs(right);
+                    }
+                    if (alignment)
                         offsetLeft += left;
                     else
                         offsetLeft += right;
-                    pagebarContainer.css('left', offsetLeft + 'px');
+                    offsetLeft = Math.min(0, offsetLeft);
+                    offsetLeft = Math.max(pagebarTabMinWidth - allPagebarItemWidth, offsetLeft);
+                    if (offsetLeft >= 0)
+                        pagebarContainer.css('left', '');
+                    else
+                        pagebarContainer.css('left', offsetLeft + 'px');
                 }
+                let pagebarLeftward = pagebarTabs.find(Selectors.pagebar.leftward);
+                let pagebarRightward = pagebarTabs.find(Selectors.pagebar.rightward);
+                if (offsetLeft >= 0) pagebarLeftward.addClass('disabled');
+                else pagebarLeftward.removeClass('disabled');
+                if (Math.fround(offsetLeft + allPagebarItemWidth) <= Math.fround(pagebarTabMinWidth)) pagebarRightward.addClass('disabled');
+                else pagebarRightward.removeClass('disabled');
             }
         }
         private activeModule(module?: ModulePageProxy): void {
@@ -295,18 +352,20 @@ namespace WM.Admin {
         }
         private closeModule(module?: ModulePageProxy): void {
             if (module == undefined || !module.Options.closable) return;
-            if (module.IsActive && this.Modules.length > 1) {
-                let nextModule: ModulePageProxy | undefined;
+            let nextModule: ModulePageProxy | undefined;
+            if (this.Modules.length > 1) {
                 let offset = _.indexOf(this.Modules, module);
                 if (offset + 1 == this.Modules.length)
                     nextModule = this.Modules[offset - 1];
                 else
                     nextModule = this.Modules[offset + 1];
-                nextModule.active();
             }
-            let modules = _.pull(this.Modules, module);
+            let active = module.IsActive;
+            _.pull(this.Modules, module);
             module.close();
-            this.adjustPagebar();
+            if (active && nextModule) this.activeModule(nextModule);
+            else if (!active && nextModule) this.adjustPagebar(nextModule);
+            else this.adjustPagebar();
         }
         private findModule(condition: string | JQuery | HTMLElement): ModulePageProxy | undefined {
 
