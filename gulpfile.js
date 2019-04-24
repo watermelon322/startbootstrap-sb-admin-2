@@ -50,6 +50,15 @@ function modules() {
   // lodash
   var lodash = gulp.src(['./node_modules/lodash/lodash.js', './node_modules/lodash/lodash.min.js'])
     .pipe(gulp.dest('./vendor/lodash'));
+  // moment
+  var moment = gulp
+    .src([
+      './node_modules/moment/moment.js',
+      './node_modules/moment/min/moment.min.js',
+      './node_modules/moment/min/moment-with-locales.js',
+      './node_modules/moment/min/moment-with-locales.min.js'
+    ])
+    .pipe(gulp.dest('./vendor/moment'));
   // Font Awesome
   var fontAwesome = gulp.src('./node_modules/@fortawesome/**/*')
     .pipe(gulp.dest('./vendor'));
@@ -65,7 +74,7 @@ function modules() {
     '!./node_modules/jquery/dist/core.js'
   ])
     .pipe(gulp.dest('./vendor/jquery'));
-  return merge(bootstrapJS, bootstrapSCSS, chartJS, dataTables, lodash, fontAwesome, jquery, jqueryEasing, jquerySlimscroll);
+  return merge(bootstrapJS, bootstrapSCSS, chartJS, dataTables, moment, lodash, fontAwesome, jquery, jqueryEasing, jquerySlimscroll);
 }
 
 // CSS task
