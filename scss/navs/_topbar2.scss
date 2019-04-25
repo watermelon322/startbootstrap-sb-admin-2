@@ -7,8 +7,7 @@
             border-right: 0;
         }
 
-        #messagesContainer,
-        #alertsContainer {
+        .wm-tc-container {
             >.dropdown-item:last-child {
                 border-bottom: none;
             }

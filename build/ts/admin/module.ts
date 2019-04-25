@@ -58,8 +58,14 @@ namespace WM.Admin {
         public logout(): void {
             this.Real.invoke('logout', arguments);
         }
-        public open(options: IOpenOptions): void {
-            this.Real.invoke('open', arguments);
+        public openModule(options: IOpenModuleOptions): void {
+            this.Real.invoke('openModule', arguments);
+        }
+        public addMessage(message: IMessageData): void {
+            this.Real.invoke('addMessage', arguments);
+        }
+        public addAlert(alert: IAlertData): void {
+            this.Real.invoke('addAlert', arguments);
         }
 
         private renewReal() {

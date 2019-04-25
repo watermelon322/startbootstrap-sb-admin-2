@@ -42,10 +42,10 @@ function modules() {
     .pipe(gulp.dest('./vendor/chart.js'));
   // dataTables
   var dataTables = gulp.src([
-    './node_modules/datatables.net/js/*.js',
-    './node_modules/datatables.net-bs4/js/*.js',
-    './node_modules/datatables.net-bs4/css/*.css'
-  ])
+      './node_modules/datatables.net/js/*.js',
+      './node_modules/datatables.net-bs4/js/*.js',
+      './node_modules/datatables.net-bs4/css/*.css'
+    ])
     .pipe(gulp.dest('./vendor/datatables'));
   // lodash
   var lodash = gulp.src(['./node_modules/lodash/lodash.js', './node_modules/lodash/lodash.min.js'])
@@ -56,9 +56,16 @@ function modules() {
       './node_modules/moment/moment.js',
       './node_modules/moment/min/moment.min.js',
       './node_modules/moment/min/moment-with-locales.js',
-      './node_modules/moment/min/moment-with-locales.min.js'
+      './node_modules/moment/min/moment-with-locales.min.js',
+      './node_modules/moment/min/locales.js',
+      './node_modules/moment/min/locales.min.js'
     ])
     .pipe(gulp.dest('./vendor/moment'));
+  var moment_locale = gulp
+    .src([
+      './node_modules/moment/locale/**/*.js'
+    ])
+    .pipe(gulp.dest('./vendor/moment/locale'));
   // Font Awesome
   var fontAwesome = gulp.src('./node_modules/@fortawesome/**/*')
     .pipe(gulp.dest('./vendor'));
@@ -70,11 +77,11 @@ function modules() {
     .pipe(gulp.dest('./vendor/jquery-slimscroll'));
   // jQuery
   var jquery = gulp.src([
-    './node_modules/jquery/dist/*',
-    '!./node_modules/jquery/dist/core.js'
-  ])
+      './node_modules/jquery/dist/*',
+      '!./node_modules/jquery/dist/core.js'
+    ])
     .pipe(gulp.dest('./vendor/jquery'));
-  return merge(bootstrapJS, bootstrapSCSS, chartJS, dataTables, moment, lodash, fontAwesome, jquery, jqueryEasing, jquerySlimscroll);
+  return merge(bootstrapJS, bootstrapSCSS, chartJS, dataTables, moment, moment_locale, lodash, fontAwesome, jquery, jqueryEasing, jquerySlimscroll);
 }
 
 // CSS task

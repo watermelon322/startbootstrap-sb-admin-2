@@ -104,114 +104,47 @@
           <!-- Topbar Navbar -->
           <ul class="navbar-nav ml-auto">
             <!-- Nav Item - Alerts -->
-            <li class="nav-item dropdown no-arrow mx-1">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+            <li class="wm-topbarcenter wm-alert nav-item dropdown no-arrow mx-1">
+              <a class="wm-tc-shower nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
                 <i class="fas fa-bell fa-fw"></i>
                 <!-- Counter - Alerts -->
-                <span class="badge badge-danger badge-counter">3+</span>
+                <span class="wm-tc-badge badge badge-danger badge-counter"></span>
               </a>
               <!-- Dropdown - Alerts -->
-              <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in">
+              <div class="wm-tc-panel dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in">
                 <h6 class="dropdown-header">
-                  提醒中心
+                  <i class="fas fa-bell fa-fw"></i>
+                  <span>提醒中心</span>
                 </h6>
-                <div id="alertsContainer">
-                  <a class="dropdown-item d-flex align-items-center" href="#">
-                    <div class="mr-3">
-                      <div class="icon-circle bg-primary">
-                        <i class="fas fa-file-alt text-white"></i>
-                      </div>
-                    </div>
-                    <div>
-                      <div class="small text-gray-500">December 12, 2019</div>
-                      <span class="font-weight-bold">A new monthly report is ready to download!</span>
-                    </div>
-                  </a>
-                  <a class="dropdown-item d-flex align-items-center" href="#">
-                    <div class="mr-3">
-                      <div class="icon-circle bg-success">
-                        <i class="fas fa-donate text-white"></i>
-                      </div>
-                    </div>
-                    <div>
-                      <div class="small text-gray-500">December 7, 2019</div>
-                      $290.29 has been deposited into your account!
-                    </div>
-                  </a>
-                  <a class="dropdown-item d-flex align-items-center" href="#">
-                    <div class="mr-3">
-                      <div class="icon-circle bg-warning">
-                        <i class="fas fa-exclamation-triangle text-white"></i>
-                      </div>
-                    </div>
-                    <div>
-                      <div class="small text-gray-500">December 2, 2019</div>
-                      Spending Alert: We've noticed unusually high spending for your account.
-                    </div>
-                  </a>
+                <div class="wm-tc-container">
+                  <div class="nodata text-gray-500">
+                    <i class="fas fa-bell fa-fw"></i>
+                    <span>没有提醒!</span>
+                  </div>
                 </div>
                 <a class="dropdown-item dropdown-footer text-center small text-gray-500" href="#">查看所有提醒</a>
               </div>
             </li>
 
             <!-- Nav Item - Messages -->
-            <li class="nav-item dropdown no-arrow mx-1">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+            <li class="wm-topbarcenter wm-message nav-item dropdown no-arrow mx-1">
+              <a class="wm-tc-shower nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
                 <i class="fas fa-envelope fa-fw"></i>
                 <!-- Counter - Messages -->
-                <span class="badge badge-danger badge-counter">7</span>
+                <span class="wm-tc-badge badge badge-danger badge-counter"></span>
               </a>
               <!-- Dropdown - Messages -->
-              <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in">
+              <div class="wm-tc-panel dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in">
                 <h6 class="dropdown-header">
-                  消息中心
+                  <i class="fas fa-envelope fa-fw"></i>
+                  <span>消息中心</span>
                 </h6>
-                <div id="messagesContainer">
-                  <a class="dropdown-item d-flex align-items-center" href="#">
-                    <div class="dropdown-list-image mr-3">
-                      <img class="rounded-circle" src="img/undraw_posting_photo.svg" alt="">
-                      <div class="status-indicator bg-success"></div>
-                    </div>
-                    <div class="font-weight-bold">
-                      <div class="text-truncate">Hi there! I am wondering if you can help me with a problem I've been
-                        having.</div>
-                      <div class="small text-gray-500">Emily Fowler · 58m</div>
-                    </div>
-                  </a>
-                  <a class="dropdown-item d-flex align-items-center" href="#">
-                    <div class="dropdown-list-image mr-3">
-                      <img class="rounded-circle" src="img/undraw_posting_photo.svg" alt="">
-                      <div class="status-indicator"></div>
-                    </div>
-                    <div>
-                      <div class="text-truncate">I have the photos that you ordered last month, how would you like them
-                        sent to you?</div>
-                      <div class="small text-gray-500">Jae Chun · 1d</div>
-                    </div>
-                  </a>
-                  <a class="dropdown-item d-flex align-items-center" href="#">
-                    <div class="dropdown-list-image mr-3">
-                      <img class="rounded-circle" src="img/undraw_posting_photo.svg" alt="">
-                      <div class="status-indicator bg-warning"></div>
-                    </div>
-                    <div>
-                      <div class="text-truncate">Last month's report looks great, I am very happy with the progress so
-                        far, keep up the good work!</div>
-                      <div class="small text-gray-500">Morgan Alvarez · 2d</div>
-                    </div>
-                  </a>
-                  <a class="dropdown-item d-flex align-items-center" href="#">
-                    <div class="dropdown-list-image mr-3">
-                      <img class="rounded-circle" src="img/undraw_posting_photo.svg" alt="">
-                      <div class="status-indicator bg-success"></div>
-                    </div>
-                    <div>
-                      <div class="text-truncate">Am I a good boy? The reason I ask is because someone told me that
-                        people
-                        say this to all dogs, even if they aren't good...</div>
-                      <div class="small text-gray-500">Chicken the Dog · 2w</div>
-                    </div>
-                  </a></div>
+                <div class="wm-tc-container">
+                  <div class="nodata text-gray-500">
+                    <i class="fas fa-envelope fa-fw"></i>
+                    <span>没有最新消息!</span>
+                  </div>
+                </div>
                 <a class="dropdown-item dropdown-footer text-center small text-gray-500" href="#">查看所有消息</a>
               </div>
             </li>
@@ -317,14 +250,16 @@
     </div>
   </div>
 
-  <script src="vendor/lodash/lodash.min.js"></script>
+  <script src="vendor/moment/moment.js"></script>
+  <script src="vendor/moment/locale/zh-cn.js"></script>
+  <script src="vendor/lodash/lodash.js"></script>
   <!-- Bootstrap core JavaScript-->
   <script src="vendor/jquery/jquery.js"></script>
-  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.js"></script>
 
   <!-- Core plugin JavaScript-->
-  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-  <script src="vendor/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+  <script src="vendor/jquery-easing/jquery.easing.js"></script>
+  <script src="vendor/jquery-slimscroll/jquery.slimscroll.js"></script>
 
   <!-- Custom scripts for all pages-->
   <script src="dist/js/wm/admin/framework.js"></script>

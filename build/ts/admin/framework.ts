@@ -1,14 +1,50 @@
 /// <reference path="../wm.ts"/>
 
 namespace WM.Admin {
+    /**
+     * 属性库
+     */
     let Attributes = {
+        /**
+         * 框架属性库
+         */
         'WM': {
+            /**
+             * 唯一键
+             * @type string
+             */
             'key': 'wm-key',
+            /**
+             * 图标
+             */
             'icon': 'wm-icon',
+            /**
+             * 事件触发器
+             */
             'trigger': 'wm-trigger',
+            'messageCenter': { 'itemData': 'wm-mc-itemdata' },
+            'alertCenter': { 'itemData': 'wm-ac-itemdata' }
         }
     }
+    /**
+     * css类名库
+     */
     let ClassNames = {
+        'topbar': {
+            'topbarCenter': {
+                'root': 'wm-topbarcenter',
+                'alertCenter': 'wm-alert',
+                'messageCenter': 'wm-message'
+            },
+            'alertCenter': {
+                'item': 'wm-ac-item',
+                'itemTime': 'wm-ac-itemtime'
+            },
+            'messageCenter': {
+                'item': 'wm-mc-item',
+                'itemTime': 'wm-mc-itemtime'
+            }
+        },
         'pagebar': {
             'leftward': 'pagebar-leftward',
             'rightward': 'pagebar-rightward',
@@ -32,17 +68,38 @@ namespace WM.Admin {
             'itemActive': 'active'
         },
     }
+    /**
+     * HTML选择器
+     */
     let Selectors = {
         'layout': {
             'leftSidebar': '#leftSideBar',
-            'navbar': '#content > .navbar',
+            'topbar': '#content > .navbar',
             'content': '#content',
             'pagebar': '#content > .pagebar',
             'pagefrm': '#content > .pagefrm'
         },
         'topbar': {
-            'alertcenter': { 'alertsContainer': '#alertsContainer' },
-            'messagecenter': { 'messagesContainer': '#messagesContainer' }
+            'topbarCenter': {
+                'root': `.${ClassNames.topbar.topbarCenter.root}`,
+                'alertCenter': `.${ClassNames.topbar.topbarCenter.root}.${ClassNames.topbar.topbarCenter.alertCenter}`,
+                'messageCenter': `.${ClassNames.topbar.topbarCenter.root}.${ClassNames.topbar.topbarCenter.messageCenter}`,
+                'parts': {
+                    'shower': '.wm-tc-shower',
+                    'badge': '.wm-tc-badge',
+                    'panel': '.wm-tc-panel',
+                    'container': '.wm-tc-container',
+                    'nodata': '.nodata'
+                }
+            },
+            'alertCenter': {
+                'item': `.${ClassNames.topbar.alertCenter.item}`,
+                'itemTime': `.${ClassNames.topbar.alertCenter.itemTime}`
+            },
+            'messageCenter': {
+                'item': `.${ClassNames.topbar.messageCenter.item}`,
+                'itemTime': `.${ClassNames.topbar.messageCenter.itemTime}`
+            }
         },
         'sidebar': {
             'left': {
@@ -90,10 +147,175 @@ namespace WM.Admin {
         }
     }
 
+    abstract class TopbarCenter {
+        protected _root: JQuery;
+        protected _shower: JQuery;
+        protected _badge: JQuery;
+        protected _panel: JQuery;
+        protected _container: JQuery;
+        protected _nodata: JQuery;
+        constructor(root: JQuery) {
+            this._root = root;
+            this._shower = this._root.find(Selectors.topbar.topbarCenter.parts.shower);
+            this._badge = this._shower.find(Selectors.topbar.topbarCenter.parts.badge);
+            this._panel = this._root.find(Selectors.topbar.topbarCenter.parts.panel);
+            this._container = this._panel.find(Selectors.topbar.topbarCenter.parts.container);
+            this._nodata = this._container.find(Selectors.topbar.topbarCenter.parts.nodata);
+        }
+    }
+    class AlertCenter extends TopbarCenter {
+        // WM.Admin.Framework.addAlert({level:'success', icon:'fas fa-donate',content:'Hi there! I am wondering if you can help me with a problem I\'ve been having.',timestamp:new Date()})
+        public get HasContent(): boolean {
+            return this._container.children(`:not(${Selectors.topbar.topbarCenter.parts.nodata})`).length > 0;
+        }
+        constructor() {
+            super($(Selectors.topbar.topbarCenter.alertCenter));
+            this._root.on('show.bs.dropdown', () => {
+                this.updateTime();
+            });
+        }
+        public add(alerts: IAlertData | IAlertData[]): void {
+            if (alerts == undefined) return;
+            if (!TypeHelper.isArray(alerts)) alerts = [<IAlertData>alerts];
+
+            _.each(<IAlertData[]>alerts, (m) => {
+                let dom = this.createDom(m);
+                if (dom != undefined) this._container.append(dom);
+            });
+
+            this.adjust();
+        }
+        private adjust(): void {
+            if (this.HasContent)
+                this._nodata.addClass('hide');
+            else
+                this._nodata.removeClass('hide');
+            let itemElems = this._container.find(Selectors.topbar.alertCenter.item);
+            let height = _.sumBy(itemElems, (o) => $(o).outerHeight(true) || 0);
+            let maxHeight = 250;
+            if (height <= maxHeight) {
+                this._container.slimScroll({ destroy: true });
+                this._container.removeAttr('style');
+            }
+            else
+                this._container.slimScroll({ height: maxHeight + 'px' });
+            let count = itemElems.length;
+            if (count > 0) this._badge.html(count > 99 ? '...' : count.toString());
+            else this._badge.empty();
+        }
+        private createDom(alert: IAlertData): JQuery | undefined {
+            if (alert == undefined) return undefined;
+            let rootElem = $('<a class="dropdown-item d-flex align-items-center" href="#">')
+                .addClass(ClassNames.topbar.alertCenter.item);
+            rootElem.append($('<div class="mr-3">')
+                .append($('<div class="icon-circle">')
+                    .addClass(`bg-${alert.level}`)
+                    .append($('<i class="text-white"></i>')
+                        .addClass(alert.icon))));
+            rootElem.append($('<div>')
+                .append($('<div class="small text-gray-500">')
+                    .addClass(ClassNames.topbar.alertCenter.itemTime))
+                .append($('<span>').html(alert.content)));
+            rootElem.data(Attributes.WM.alertCenter.itemData, alert);
+            this.updateTime(rootElem);
+            return rootElem;
+        }
+        private updateTime(itemElems?: JQuery) {
+            let moment = (<any>window).moment;
+            if (moment == undefined) return;
+            itemElems = itemElems || this._container.find(Selectors.topbar.alertCenter.item);
+            _.each(itemElems, (o) => {
+                let itemElem = $(o);
+                let alertData = itemElem.data(Attributes.WM.alertCenter.itemData) as IMessageData;
+                if (alertData == undefined) return;
+                let timeElem = itemElem.find(Selectors.topbar.alertCenter.itemTime);
+                try {
+                    timeElem.html(moment.duration(moment(alertData.timestamp) - moment()).humanize(true));
+                } catch (e) { }
+            });
+        }
+    }
+    class MessageCenter extends TopbarCenter {
+        // WM.Admin.Framework.addMessage({level:'success', avatar:'img/undraw_posting_photo.svg',content:'Hi there! I am wondering if you can help me with a problem I\'ve been having.', from:'Emily Fowler',timestamp:new Date()})
+        public get HasContent(): boolean {
+            return this._container.children(`:not(${Selectors.topbar.topbarCenter.parts.nodata})`).length > 0;
+        }
+        constructor() {
+            super($(Selectors.topbar.topbarCenter.messageCenter));
+            this._root.on('show.bs.dropdown', () => {
+                this.updateTime();
+            });
+        }
+        public add(messages: IMessageData | IMessageData[]): void {
+            if (messages == undefined) return;
+            if (!TypeHelper.isArray(messages)) messages = [<IMessageData>messages];
+
+            _.each(<IMessageData[]>messages, (m) => {
+                let dom = this.createDom(m);
+                if (dom != undefined) this._container.append(dom);
+            });
+
+            this.adjust();
+        }
+        private adjust(): void {
+            if (this.HasContent)
+                this._nodata.addClass('hide');
+            else
+                this._nodata.removeClass('hide');
+            let itemElems = this._container.find(Selectors.topbar.messageCenter.item);
+            let height = _.sumBy(itemElems, (o) => $(o).outerHeight(true) || 0);
+            let maxHeight = 250;
+            if (height <= maxHeight) {
+                this._container.slimScroll({ destroy: true });
+                this._container.removeAttr('style');
+            }
+            else
+                this._container.slimScroll({ height: maxHeight + 'px' });
+            let count = itemElems.length;
+            if (count > 0) this._badge.html(count > 99 ? '...' : count.toString());
+            else this._badge.empty();
+        }
+        private createDom(message: IMessageData): JQuery | undefined {
+            if (message == undefined) return undefined;
+            let rootElem = $('<a class="dropdown-item d-flex align-items-center" href="#">')
+                .addClass(ClassNames.topbar.messageCenter.item);
+            rootElem.append($('<div class="dropdown-list-image mr-3">')
+                .append($('<img class="rounded-circle">')
+                    .attr('src', message.avatar))
+                .append($('<div class="status-indicator"></div>')
+                    .addClass(`bg-${message.level}`)));
+            rootElem.append($('<div>')
+                .append($('<div class="text-truncate">')
+                    .html(message.content))
+                .append($('<div class="small text-gray-500">')
+                    .append($('<span>').html(message.from))
+                    .append($('<span>').addClass(ClassNames.topbar.messageCenter.itemTime))));
+            rootElem.data(Attributes.WM.messageCenter.itemData, message);
+            this.updateTime(rootElem);
+            return rootElem;
+        }
+
+        private updateTime(itemElems?: JQuery) {
+            let moment = (<any>window).moment;
+            if (moment == undefined) return;
+            itemElems = itemElems || this._container.find(Selectors.topbar.messageCenter.item);
+            _.each(itemElems, (o) => {
+                let itemElem = $(o);
+                let msgData = itemElem.data(Attributes.WM.messageCenter.itemData) as IMessageData;
+                if (msgData == undefined) return;
+                let timeElem = itemElem.find(Selectors.topbar.messageCenter.itemTime);
+                try {
+                    timeElem.html(' - ' + moment.duration(moment(msgData.timestamp) - moment()).humanize(true));
+                } catch (e) { }
+            });
+        }
+    }
+
     export class FrameworkPage implements IFrameworkPage {
 
         private _modules: Array<ModulePageProxy>;
-
+        private _alertCenter: AlertCenter;
+        private _messageCenter: MessageCenter;
         private _handlers: FrameworkPageEventHandlers;
 
         public get ActivedModule(): ModulePageProxy | undefined {
@@ -109,6 +331,8 @@ namespace WM.Admin {
         constructor() {
             let framework = this;
             this._modules = new Array<ModulePageProxy>();
+            this._alertCenter = new AlertCenter();
+            this._messageCenter = new MessageCenter();
             this._handlers = new FrameworkPageEventHandlers(framework);
 
             $(Selectors.trigger).each(function (n, o) {
@@ -125,7 +349,7 @@ namespace WM.Admin {
             let count = Math.max(pagefrmItems.length, pagebarItems.length);
             if (count > 0) {
                 for (let index = 0; index < count; index++) {
-                    const options: IOpenOptions = { closable: false };
+                    const options: IOpenModuleOptions = { closable: false };
                     let pagefrmItem: JQuery | undefined = undefined;
                     let pagebarItem: JQuery | undefined = undefined;
                     if (pagefrmItems.length > index) {
@@ -172,6 +396,7 @@ namespace WM.Admin {
                 .on('click', '*', function (e) {
                     $(Selectors.pagebar.menus.menu).addClass('hide');
                 })
+                // Pagebar右键菜单事件
                 .on('contextmenu', `${Selectors.layout.pagebar} ${Selectors.pagebar.container}`, function (e) {
                     let that = $(this);
                     let menuElem = $(Selectors.pagebar.menus.menu);
@@ -207,6 +432,7 @@ namespace WM.Admin {
                     }
                     return false;
                 })
+                // Pagebar右键菜单项点击事件
                 .on('click', `${Selectors.layout.pagebar} ${Selectors.pagebar.menus.items}:not(.disabled):not(.divider)`, function (e) {
                     let that = $(this);
                     let target: JQuery | undefined = $(e.target);
@@ -236,24 +462,29 @@ namespace WM.Admin {
                     }
                     return false;
                 })
+                // Pagebar左移事件
                 .on('click', `${Selectors.layout.pagebar} ${Selectors.pagebar.leftward}:not(.disabled)`, function (e) {
                     framework.leftwardPagebar();
                     return false;
                 })
+                // Pagebar右移事件
                 .on('click', `${Selectors.layout.pagebar} ${Selectors.pagebar.rightward}:not(.disabled)`, function (e) {
                     framework.rightwardPagebar();
                     return false;
                 })
+                // Pagebar项点击关闭事件
                 .on('click', `${Selectors.layout.pagebar} ${Selectors.pagebar.itemClose}`, function (e) {
                     let module = framework.findModule($(this).parent());
                     framework.closeModule(module);
                     return false;
                 })
+                // Pagebar项点击激活事件
                 .on('click', `${Selectors.layout.pagebar} ${Selectors.pagebar.items}`, function (e) {
                     let module = framework.findModule($(this));
                     framework.activeModule(module);
                     return false;
                 })
+                // LeftSidebar模块菜单点击打开事件
                 .on('click', '.sidebar .nav-item > a.nav-link, .sidebar a.collapse-item', function (e) {
                     let aElem = $(this);
                     let divElem = aElem.next('div.collapse');
@@ -267,12 +498,12 @@ namespace WM.Admin {
                         }
                     } else {
                         try {
-                            let options: IOpenOptions = {};
+                            let options: IOpenModuleOptions = {};
                             options.url = aElem.attr('href');
                             options.name = $.trim(aElem.text());
                             options.wmkey = aElem.attr(Attributes.WM.key) || aElem.data(Attributes.WM.key);
                             options.icon = aElem.attr(Attributes.WM.icon) || aElem.data(Attributes.WM.icon);
-                            framework.open(options);
+                            framework.openModule(options);
                         } catch (error) {
                             Log.error(error);
                         }
@@ -280,12 +511,6 @@ namespace WM.Admin {
                     return false;
                 });
 
-            $(Selectors.topbar.alertcenter.alertsContainer).slimScroll({
-                height: '250px'
-            });
-            $(Selectors.topbar.messagecenter.messagesContainer).slimScroll({
-                height: '250px'
-            });
             framework.fixSize();
         }
 
@@ -319,31 +544,12 @@ namespace WM.Admin {
             this.trigger('logout', arguments);
         }
 
-        public open(options: IOpenOptions): void {
-            let framework = this;
-            var options: IOpenOptions = $.extend({
-                'closable': true,
-                'icon': 'wfs wf-module'
-            }, options);
-            options.wmkey = options.wmkey || '';
-            options.name = options.name || '';
-            options.url = options.url || '';
-
-            let module = this.findModule(options.wmkey);
-            if (module == undefined && $.trim(options.url) == '') return;
-            else if (module == undefined && $.trim(options.url) != '') {
-                module = new ModulePageProxy(options);
-                this.Modules.push(module);
-            }
-            framework.activeModule(module);
-        }
-
         /**
          * 修正框架iframe,Pagebar尺寸
          */
         private fixSize(): void {
 
-            let navbarHeight = $(Selectors.layout.navbar).outerHeight(true) as number;
+            let navbarHeight = $(Selectors.layout.topbar).outerHeight(true) as number;
             let pagebarHeight = $(Selectors.layout.pagebar).outerHeight(true) as number;
             let contentHeight = $(Selectors.layout.content).height() as number;
             $(Selectors.layout.pagefrm).height(contentHeight - navbarHeight - pagebarHeight);
@@ -452,6 +658,25 @@ namespace WM.Admin {
                 else pagebarRightward.removeClass('disabled');
             }
         }
+
+        public openModule(options: IOpenModuleOptions): void {
+            let framework = this;
+            var options: IOpenModuleOptions = $.extend({
+                'closable': true,
+                'icon': 'wfs wf-module'
+            }, options);
+            options.wmkey = options.wmkey || '';
+            options.name = options.name || '';
+            options.url = options.url || '';
+
+            let module = this.findModule(options.wmkey);
+            if (module == undefined && $.trim(options.url) == '') return;
+            else if (module == undefined && $.trim(options.url) != '') {
+                module = new ModulePageProxy(options);
+                this.Modules.push(module);
+            }
+            framework.activeModule(module);
+        }
         private activeModule(module?: ModulePageProxy): void {
             if (module == undefined) return;
             $.each(this.Modules, function (n, o) {
@@ -508,10 +733,17 @@ namespace WM.Admin {
 
             return module;
         }
+
+        public addMessage(message: IMessageData) {
+            this._messageCenter.add(message);
+        }
+        public addAlert(alert: IAlertData) {
+            this._alertCenter.add(alert);
+        }
     }
 
     class ModulePageProxy extends Proxy.Proxy<IModulePage> implements IModulePage {
-        protected _options: IOpenOptions;
+        protected _options: IOpenModuleOptions;
         public PagebarItem?: JQuery;
         public PagefrmItem?: JQuery;
 
@@ -531,13 +763,13 @@ namespace WM.Admin {
                 return true;
             return false;
         }
-        public get Options(): IOpenOptions {
+        public get Options(): IOpenModuleOptions {
             return this._options;
         }
         public get Framework(): IFrameworkPage {
             return this.Real.get('FrameworkPage');
         }
-        constructor(options: IOpenOptions, pagebarItem?: JQuery, pagefrmItem?: JQuery) {
+        constructor(options: IOpenModuleOptions, pagebarItem?: JQuery, pagefrmItem?: JQuery) {
             super(undefined);
 
             this._options = options;

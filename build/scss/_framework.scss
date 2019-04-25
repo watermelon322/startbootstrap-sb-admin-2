@@ -1,0 +1,15 @@
+.wm-topbarcenter {
+    .wm-tc-container {
+        .nodata {
+            font-size: 2rem;
+            text-align: center;
+            height: 100%;
+            user-select: none;
+            padding: 1rem 0;
+
+            &.hide {
+                display: none !important;
+            }
+        }
+    }
+}

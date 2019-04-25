@@ -1,3 +1,6 @@
+
+// import moment = require("../../node_modules/moment/moment");
+
 namespace WM {
     export var debug: boolean;
     debug = WM.debug || true;
@@ -89,7 +92,22 @@ namespace WM {
                 return typeof instance;
         }
         public static isFunction(instance: any) {
-            return TypeHelper.getType(instance) === 'function';
+            return TypeHelper.isType(instance, 'function');
+        }
+        public static isArray(instance: any) {
+            return TypeHelper.isType(instance, 'Array');
+        }
+        public static isType(instance: any, type: string) {
+            let result: boolean = false;
+            let _t = TypeHelper.getType(instance);
+            if (_t === 'object' && _t === type)
+                result = true;
+            else if (_t === 'object')
+                result = TypeHelper.getName(instance) === type;
+            else
+                result = _t === type;
+
+            return result;
         }
         public static get(instance: any, member: string, error: boolean = false) {
             if (!TypeHelper.Valid(instance)) {
