@@ -14,10 +14,21 @@ namespace WM.Admin {
              * @type string
              */
             'key': 'wm-key',
-            /**
-             * 图标
-             */
-            'icon': 'wm-icon',
+            'module': 'wm-module',
+            'moduleData': {
+                /**
+                 * 名称
+                 */
+                'name': 'wm-name',
+                /**
+                 * 图标
+                 */
+                'icon': 'wm-icon',
+                /**
+                 * 地址
+                 */
+                'url': 'wm-url'
+            },
             /**
              * 事件触发器
              */
@@ -132,27 +143,50 @@ namespace WM.Admin {
         'trigger': `[${Attributes.WM.trigger}]`
     };
 
+    /**
+     * 框架页面事件处理器
+     */
     class FrameworkPageEventHandlers {
+        /**框架页面 */
         private _framework: IFrameworkPage;
+        /**框架页面 */
         public get Framework(): IFrameworkPage {
             return this._framework;
         }
 
+        /**
+         * 初始化框架页面事件处理器
+         * @param framework 框架页面
+         */
         constructor(framework: IFrameworkPage) {
             this._framework = framework;
         }
 
+        /**
+         * 退出事件处理器
+         * @param event 事件对象
+         */
         public onlogout(event: JQuery.Event): void {
+            // 打开确认退出对话框
             $(Selectors.dialogs.Logout).modal();
         }
     }
 
+    /**
+     * 顶部导航条控制中心
+     */
     abstract class TopbarCenter {
+        /**JQuery根元素 */
         protected _root: JQuery;
+        /**JQuery显示元素 */
         protected _shower: JQuery;
+        /**JQuery徽章元素 */
         protected _badge: JQuery;
+        /**JQuery面板元素 */
         protected _panel: JQuery;
+        /**JQuery面板内容元素 */
         protected _container: JQuery;
+        /**JQuery面板无内容显示元素 */
         protected _nodata: JQuery;
         constructor(root: JQuery) {
             this._root = root;
@@ -163,8 +197,12 @@ namespace WM.Admin {
             this._nodata = this._container.find(Selectors.topbar.topbarCenter.parts.nodata);
         }
     }
+    /**
+     * 顶部导航条提醒中心
+     */
     class AlertCenter extends TopbarCenter {
         // WM.Admin.Framework.addAlert({level:'success', icon:'fas fa-donate',content:'Hi there! I am wondering if you can help me with a problem I\'ve been having.',timestamp:new Date()})
+        /**面板是否有内容 */
         public get HasContent(): boolean {
             return this._container.children(`:not(${Selectors.topbar.topbarCenter.parts.nodata})`).length > 0;
         }
@@ -174,6 +212,10 @@ namespace WM.Admin {
                 this.updateTime();
             });
         }
+        /**
+         * 新增一或多条提醒
+         * @param alerts 提醒
+         */
         public add(alerts: IAlertData | IAlertData[]): void {
             if (alerts == undefined) return;
             if (!TypeHelper.isArray(alerts)) alerts = [<IAlertData>alerts];
@@ -185,24 +227,38 @@ namespace WM.Admin {
 
             this.adjust();
         }
+        /**
+         * 调整
+         */
         private adjust(): void {
+            // 判断面板是否有内容
             if (this.HasContent)
                 this._nodata.addClass('hide');
             else
                 this._nodata.removeClass('hide');
+
+            // 获取面板内容总高度
             let itemElems = this._container.find(Selectors.topbar.alertCenter.item);
             let height = _.sumBy(itemElems, (o) => $(o).outerHeight(true) || 0);
             let maxHeight = 250;
             if (height <= maxHeight) {
+                // 未超过限制, 移除滚动条
                 this._container.slimScroll({ destroy: true });
                 this._container.removeAttr('style');
             }
             else
+                // 已超过限制, 增加滚动条
                 this._container.slimScroll({ height: maxHeight + 'px' });
+
+            // 更新徽章内容
             let count = itemElems.length;
             if (count > 0) this._badge.html(count > 99 ? '...' : count.toString());
             else this._badge.empty();
         }
+        /**
+         * 创建提醒HTML元素
+         * @param alert 提醒
+         */
         private createDom(alert: IAlertData): JQuery | undefined {
             if (alert == undefined) return undefined;
             let rootElem = $('<a class="dropdown-item d-flex align-items-center" href="#">')
@@ -220,6 +276,9 @@ namespace WM.Admin {
             this.updateTime(rootElem);
             return rootElem;
         }
+        /**
+         * 更新提醒时间
+         */
         private updateTime(itemElems?: JQuery) {
             let moment = (<any>window).moment;
             if (moment == undefined) return;
@@ -235,8 +294,12 @@ namespace WM.Admin {
             });
         }
     }
+    /**
+     * 顶部导航条消息中心
+     */
     class MessageCenter extends TopbarCenter {
         // WM.Admin.Framework.addMessage({level:'success', avatar:'img/undraw_posting_photo.svg',content:'Hi there! I am wondering if you can help me with a problem I\'ve been having.', from:'Emily Fowler',timestamp:new Date()})
+        /**面板是否有内容 */
         public get HasContent(): boolean {
             return this._container.children(`:not(${Selectors.topbar.topbarCenter.parts.nodata})`).length > 0;
         }
@@ -246,6 +309,10 @@ namespace WM.Admin {
                 this.updateTime();
             });
         }
+        /**
+         * 新增一或多条消息
+         * @param alerts 消息
+         */
         public add(messages: IMessageData | IMessageData[]): void {
             if (messages == undefined) return;
             if (!TypeHelper.isArray(messages)) messages = [<IMessageData>messages];
@@ -257,24 +324,38 @@ namespace WM.Admin {
 
             this.adjust();
         }
+        /**
+         * 调整
+         */
         private adjust(): void {
+            // 判断面板是否有内容
             if (this.HasContent)
                 this._nodata.addClass('hide');
             else
                 this._nodata.removeClass('hide');
+
+            // 获取面板内容总高度
             let itemElems = this._container.find(Selectors.topbar.messageCenter.item);
             let height = _.sumBy(itemElems, (o) => $(o).outerHeight(true) || 0);
             let maxHeight = 250;
             if (height <= maxHeight) {
+                // 未超过限制, 移除滚动条
                 this._container.slimScroll({ destroy: true });
                 this._container.removeAttr('style');
             }
             else
+                // 已超过限制, 增加滚动条
                 this._container.slimScroll({ height: maxHeight + 'px' });
+
+            // 更新徽章内容
             let count = itemElems.length;
             if (count > 0) this._badge.html(count > 99 ? '...' : count.toString());
             else this._badge.empty();
         }
+        /**
+         * 创建消息HTML元素
+         * @param alert 消息
+         */
         private createDom(message: IMessageData): JQuery | undefined {
             if (message == undefined) return undefined;
             let rootElem = $('<a class="dropdown-item d-flex align-items-center" href="#">')
@@ -295,6 +376,9 @@ namespace WM.Admin {
             return rootElem;
         }
 
+        /**
+         * 更新提醒时间
+         */
         private updateTime(itemElems?: JQuery) {
             let moment = (<any>window).moment;
             if (moment == undefined) return;
@@ -311,21 +395,41 @@ namespace WM.Admin {
         }
     }
 
+    /**
+     * 框架页面
+     */
     export class FrameworkPage implements IFrameworkPage {
 
-        private _modules: Array<ModulePageProxy>;
-        private _alertCenter: AlertCenter;
-        private _messageCenter: MessageCenter;
-        private _handlers: FrameworkPageEventHandlers;
+        /**模块页集合 */
+        protected _modules: Array<ModulePageProxy>;
+        /**提醒中心 */
+        protected _alertCenter: AlertCenter;
+        /**消息中心 */
+        protected _messageCenter: MessageCenter;
+        /**事件处理器 */
+        protected _handlers: FrameworkPageEventHandlers;
+        /**事件触发器 */
+        protected _events: JQuery<FrameworkPageEventHandlers>;
 
+        /**当前模块页 */
         public get ActivedModule(): ModulePageProxy | undefined {
             return _.find(this.Modules, function (m) { return m.IsActive; });
         }
+        /**模块页集合 */
         public get Modules(): Array<ModulePageProxy> {
             return this._modules;
         }
+        /**模块页Pagebar标签总宽度 */
         public get AllModuleBarWidth(): number {
             return _.sumBy(this.Modules, function (o) { return o.BarWidth; })
+        }
+        /**事件处理器 */
+        public get EventHandlers(): FrameworkPageEventHandlers {
+            return this._handlers;
+        }
+        /**事件触发器 */
+        public get Events(): JQuery<FrameworkPageEventHandlers> {
+            return this._events;
         }
 
         constructor() {
@@ -333,13 +437,10 @@ namespace WM.Admin {
             this._modules = new Array<ModulePageProxy>();
             this._alertCenter = new AlertCenter();
             this._messageCenter = new MessageCenter();
-            this._handlers = new FrameworkPageEventHandlers(framework);
+            this._handlers = new FrameworkPageEventHandlers(this);
+            this._events = $(this._handlers);
 
-            $(Selectors.trigger).each(function (n, o) {
-                framework.bindTrigger($(o));
-            });
-
-            // clear pagebar-tab-container space
+            // 重新构造Pagebar及Pagefrm,顺便清理非PagebarItem及PagefrmItem内容
             let pagebarContainer = $(`${Selectors.layout.pagebar} ${Selectors.pagebar.container}`);
             let pagefrm = $(Selectors.layout.pagefrm);
             let pagefrmItems = $(`${Selectors.layout.pagefrm} > iframe`);
@@ -352,40 +453,53 @@ namespace WM.Admin {
                     const options: IOpenModuleOptions = { closable: false };
                     let pagefrmItem: JQuery | undefined = undefined;
                     let pagebarItem: JQuery | undefined = undefined;
+                    // 获取IOpenModuleOptions
                     if (pagefrmItems.length > index) {
                         pagefrmItem = $(pagefrmItems[index]);
                         pagefrm.append(pagefrmItem);
                         options.wmkey = pagefrmItem.attr(Attributes.WM.key) || pagefrmItem.data(Attributes.WM.key);
-                        options.icon = pagefrmItem.attr(Attributes.WM.icon) || pagefrmItem.data(Attributes.WM.icon);
-                        options.url = pagefrmItem.attr('src');
+                        options.icon = pagefrmItem.attr(Attributes.WM.moduleData.icon) || pagefrmItem.data(Attributes.WM.moduleData.icon);
+                        options.url = pagefrmItem.attr(Attributes.WM.moduleData.url) || pagefrmItem.data(Attributes.WM.moduleData.url) || pagefrmItem.attr('src');
                     }
                     if (pagebarItems.length > index) {
                         pagebarItem = $(pagebarItems[index]);
                         pagebarContainer.append(pagebarItem);
                         options.wmkey = options.wmkey || pagebarItem.attr(Attributes.WM.key) || pagebarItem.data(Attributes.WM.key);
-                        options.icon = options.icon || pagebarItem.attr(Attributes.WM.icon) || pagebarItem.data(Attributes.WM.icon) || pagebarItem.children('i:first').attr('class');
-                        options.name = $.trim(pagebarItem.text());
+                        options.icon = options.icon || pagebarItem.attr(Attributes.WM.moduleData.icon) || pagebarItem.data(Attributes.WM.moduleData.icon) || pagebarItem.children('i:first').attr('class');
+                        options.name = options.name || pagebarItem.attr(Attributes.WM.moduleData.name) || pagebarItem.data(Attributes.WM.moduleData.name) || $.trim(pagebarItem.text());
+                        options.url = options.url || pagebarItem.attr(Attributes.WM.moduleData.url) || pagebarItem.data(Attributes.WM.moduleData.url) || $.trim(<string>pagebarItem.attr('href'));
                         options.closable = pagebarItem.is(`:has(.${ClassNames.pagebar.itemClose})`);
                     }
                     let module = new ModulePageProxy(options, pagebarItem, pagefrmItem);
                     this.Modules.push(module);
                 }
+                // 将第一个模块页激活为当前模块页
                 this.activeModule(this.Modules[0]);
             }
 
-            // Close any open menu accordions when window is resized below 768px
+            // 开始绑定事件
+            // 绑定元素具有"wm-trigger"属性的框架级事件
+            _.each($(Selectors.trigger), (o) => this.bindTrigger($(o)));
+
             $(window)
+                // 绑定窗口尺寸变更事件
                 .on('resize', function () {
                     if ($(window).width() as number < 768) {
                         $('.sidebar .collapse').collapse('hide');
                     }
 
                     framework.fixSize();
-                }).on('blur', function (e) {
+                })
+                // 绑定窗口焦点失去事件
+                .on('blur', function (e) {
+                    // 隐藏Pagebar菜单
                     $(Selectors.pagebar.menus.menu).addClass('hide');
-                });;
+                    // 隐藏顶部导航条控制中心弹出面板
+                    (<any>$(Selectors.topbar.topbarCenter.parts.shower)).dropdown("hide");
+                });
 
             $(document)
+                // 绑定收缩展开LeftSidebar事件
                 .on('click', '#sidebarToggle, #sidebarToggleTop', function (e) {
                     $('body').toggleClass('sidebar-toggled');
                     $('.sidebar').toggleClass('toggled');
@@ -394,13 +508,19 @@ namespace WM.Admin {
                     }
                 })
                 .on('click', '*', function (e) {
+                    // 隐藏Pagebar菜单
                     $(Selectors.pagebar.menus.menu).addClass('hide');
                 })
-                // Pagebar右键菜单事件
+                .on('click', `:not(${Selectors.topbar.topbarCenter.parts.shower})`, function (e) {
+                    // 隐藏顶部导航条控制中心弹出面板
+                    (<any>$(Selectors.topbar.topbarCenter.parts.shower)).dropdown("hide");
+                })
+                // 绑定Pagebar右键菜单事件
                 .on('contextmenu', `${Selectors.layout.pagebar} ${Selectors.pagebar.container}`, function (e) {
                     let that = $(this);
                     let menuElem = $(Selectors.pagebar.menus.menu);
                     $(Selectors.pagebar.menus.menu).removeClass('hide');
+                    // 计算菜单显示位置
                     let mw = <number>menuElem.outerWidth(true);
                     let x = mw + e.pageX + 5;
                     let dw = <number>$(document).width();
@@ -408,13 +528,16 @@ namespace WM.Admin {
                     else x = e.pageX;
                     menuElem.offset({ 'left': x, 'top': e.pageY });
 
+                    // 获取PagebarItem元素
                     let target: JQuery | undefined = $(e.target);
                     if (!target.is(Selectors.pagebar.items)) {
                         if (!target.is(that))
                             target = target.parent(Selectors.pagebar.items);
                         else target = undefined;
                     }
+                    // 查找模块页对象
                     let module = framework.findModule(target);
+                    // 根据模块页对象设置相关菜单项禁用启用
                     if (module != undefined) {
                         menuElem.data('module', module);
                         menuElem.find(Selectors.pagebar.menus.refresh).removeClass('disabled');
@@ -442,6 +565,7 @@ namespace WM.Admin {
                     if (target == undefined || target.length <= 0) return;
 
                     if (that.is(Selectors.pagebar.menus.closeAll)) {
+                        // 关闭全部(除不可关闭外)
                         let modules = _.filter(framework.Modules, function (o) { return <boolean>o.Options.closable; });
                         _.each(modules, function (o) { framework.closeModule(o); });
                         return false;
@@ -451,10 +575,13 @@ namespace WM.Admin {
                     if (module == undefined) return;
 
                     if (that.is(Selectors.pagebar.menus.refresh)) {
+                        // 刷新
                         framework.refreshModule(module);
                     } else if (that.is(Selectors.pagebar.menus.closeSelf)) {
+                        // 关闭
                         framework.closeModule(module);
                     } else if (that.is(Selectors.pagebar.menus.closeOther)) {
+                        // 关闭其他(除不可关闭外)
                         let modules = _.filter(framework.Modules, function (o) {
                             return module != o && <boolean>o.Options.closable;
                         });
@@ -484,8 +611,8 @@ namespace WM.Admin {
                     framework.activeModule(module);
                     return false;
                 })
-                // LeftSidebar模块菜单点击打开事件
-                .on('click', '.sidebar .nav-item > a.nav-link, .sidebar a.collapse-item', function (e) {
+                // LeftSidebar模块页菜单点击打开事件
+                .on('click', `.sidebar .nav-item > a.nav-link, .sidebar a.collapse-item, [${Attributes.WM.module}]`, function (e) {
                     let aElem = $(this);
                     let divElem = aElem.next('div.collapse');
                     if (divElem.length > 0) {
@@ -499,10 +626,10 @@ namespace WM.Admin {
                     } else {
                         try {
                             let options: IOpenModuleOptions = {};
-                            options.url = aElem.attr('href');
-                            options.name = $.trim(aElem.text());
+                            options.url = aElem.attr(Attributes.WM.moduleData.url) || aElem.data(Attributes.WM.moduleData.url) || aElem.attr('href');
+                            options.name = aElem.attr(Attributes.WM.moduleData.name) || aElem.data(Attributes.WM.moduleData.name) || $.trim(aElem.text());
                             options.wmkey = aElem.attr(Attributes.WM.key) || aElem.data(Attributes.WM.key);
-                            options.icon = aElem.attr(Attributes.WM.icon) || aElem.data(Attributes.WM.icon);
+                            options.icon = aElem.attr(Attributes.WM.moduleData.icon) || aElem.data(Attributes.WM.moduleData.icon);
                             framework.openModule(options);
                         } catch (error) {
                             Log.error(error);
@@ -514,34 +641,49 @@ namespace WM.Admin {
             framework.fixSize();
         }
 
+        /**
+         * 触发框架级事件
+         * @param event 事件
+         * @param extraParameters 事件数据
+         */
         public trigger(event: string | JQuery.Event, extraParameters?: any[] | JQuery.PlainObject | string | number | boolean) {
-            $(this._handlers).trigger(event, extraParameters);
+            this._events.trigger(event, extraParameters);
         }
 
-        private bindTrigger(elem: JQuery<HTMLElement>, trigger?: string, event?: string): void {
+        /**
+         * 绑定元素具有"wm-trigger"属性的框架级事件
+         * <elment wm-trigger="[{srcEvent}:]{event}" ...>
+         * @param srcElement HTML元素
+         * @param event 框架级事件
+         * @param srcEvent HTML元素事件
+         */
+        private bindTrigger(srcElement: JQuery<HTMLElement>, event?: string, srcEvent?: string): void {
             let framework = this;
-            if (trigger == undefined || trigger == '') {
-                trigger = elem.attr(Attributes.WM.trigger);
+            if (event == undefined || event == '') {
+                event = srcElement.attr(Attributes.WM.trigger);
             }
-            trigger = $.trim(trigger || '');
-            if (trigger == '' || trigger == ':') return;
-
             event = $.trim(event || '');
-            if (trigger.indexOf(':') >= 0) {
-                let temp = trigger.split(':', 2);
-                trigger = temp[1] != '' ? temp[1] : temp[0];
-                if (event == '')
-                    event = temp[0] != '' ? temp[0] : temp[1];
+            if (event == '' || event == ':') return;
+
+            srcEvent = $.trim(srcEvent || '');
+            if (event.indexOf(':') >= 0) {
+                let temp = event.split(':', 2);
+                event = temp[1] != '' ? temp[1] : temp[0];
+                if (srcEvent == '')
+                    srcEvent = temp[0] != '' ? temp[0] : temp[1];
             }
 
-            elem.on(event, function (e) {
+            srcElement.on(srcEvent, function (e) {
                 delete e.type;
-                framework.trigger(new jQuery.Event(trigger as string, e));
+                framework.trigger(new jQuery.Event(event as string, e));
             });
         }
 
+        /**
+         * 退出操作
+         */
         public logout(): void {
-            this.trigger('logout', arguments);
+            this.trigger(FrameworkPageEvents.Logout, arguments);
         }
 
         /**
@@ -606,7 +748,7 @@ namespace WM.Admin {
         }
         /**
          * 调整Pagebar偏移位置
-         * @param module 模块对象
+         * @param module 模块页对象
          * @param alignment 对齐方向，null：自动，true：向左对齐，false：向右对齐
          */
         private adjustPagebar(module?: ModulePageProxy, alignment?: boolean): void {
@@ -616,27 +758,33 @@ namespace WM.Admin {
             let pagebarContainer = pagebarTabs.find(Selectors.pagebar.container);
             let allPagebarItemWidth = this.AllModuleBarWidth;
 
-            pagebarTabs.addClass(ClassNames.pagebar.morepage);
-            let pagebarTabMinWidth = pagebarTab.width() || 0;
             pagebarTabs.removeClass(ClassNames.pagebar.morepage);
             let pagebarTabMaxWidth = pagebarTab.width() || 0;
 
             if (pagebarTabMaxWidth > allPagebarItemWidth) {
+                // 标签总宽度不溢出, 清除偏移量
                 pagebarContainer.css({ 'left': '' });
             } else {
                 pagebarTabs.addClass(ClassNames.pagebar.morepage);
+                let pagebarTabMinWidth = pagebarTab.width() || 0;
                 if (module == undefined) module = this.ActivedModule;
                 if (module == undefined) return;
 
+                // 当前偏移量
                 let offsetLeft = parseFloat(pagebarContainer.css('left'));
                 offsetLeft = isNaN(offsetLeft) ? 0 : offsetLeft;
                 let moduleLeft = module.BarOffsetLeft;
+                // 计算模块页标签左右位置
                 let moduleRange = { 'left': moduleLeft + offsetLeft, 'right': moduleLeft + offsetLeft + module.BarWidth };
                 if (moduleRange.left < 0 || moduleRange.left > pagebarTabMinWidth
                     || moduleRange.right < 0 || moduleRange.right > pagebarTabMinWidth) {
+                    // 模块页标签有溢出, 计算保证模块页标签不溢出的左移动量和右移动量
                     let left = 0 - moduleRange.left;
                     let right = pagebarTabMinWidth - moduleRange.right;
+
+                    // 未指定对齐方向
                     if (TypeHelper.getType(alignment) != "boolean") {
+                        // 哪个方向移动量小, 取哪个方向
                         alignment = Math.abs(left) < Math.abs(right);
                     }
                     if (alignment)
@@ -650,6 +798,8 @@ namespace WM.Admin {
                     pagebarContainer.css('left', '');
                 else
                     pagebarContainer.css('left', offsetLeft + 'px');
+
+                // 设置手动移动控制元素是否可用
                 let pagebarLeftward = pagebarTabs.find(Selectors.pagebar.leftward);
                 let pagebarRightward = pagebarTabs.find(Selectors.pagebar.rightward);
                 if (offsetLeft >= 0) pagebarLeftward.addClass('disabled');
@@ -659,6 +809,10 @@ namespace WM.Admin {
             }
         }
 
+        /**
+         * 打开模块页, 如已打开自动激活模块页
+         * @param options 
+         */
         public openModule(options: IOpenModuleOptions): void {
             let framework = this;
             var options: IOpenModuleOptions = $.extend({
@@ -669,31 +823,46 @@ namespace WM.Admin {
             options.name = options.name || '';
             options.url = options.url || '';
 
+            // 根据wmkey查找已打开模块页
             let module = this.findModule(options.wmkey);
             if (module == undefined && $.trim(options.url) == '') return;
             else if (module == undefined && $.trim(options.url) != '') {
+                // 未找到且地址不为空, 创建新模块页对象
                 module = new ModulePageProxy(options);
                 this.Modules.push(module);
             }
+            // 激活模块页
             framework.activeModule(module);
         }
+        /**
+         * 激活模块页
+         * @param module 指定模块页激话
+         */
         private activeModule(module?: ModulePageProxy): void {
             if (module == undefined) return;
-            $.each(this.Modules, function (n, o) {
+            _.each(this.Modules, (o) => {
                 if (module != o)
                     o.inactive();
                 else module.active();
             });
             this.adjustPagebar();
         }
+        /**
+         * 关闭模块页
+         * @param module 指定模块页关闭
+         */
         private closeModule(module?: ModulePageProxy): void {
             if (module == undefined || !module.Options.closable) return;
+            // 获取关闭后需要调整或激活的模块页
             let nextModule: ModulePageProxy | undefined;
             if (this.Modules.length > 1) {
                 let offset = _.indexOf(this.Modules, module);
+                // 是否最后一个
                 if (offset + 1 == this.Modules.length)
+                    // 是, 取前一个
                     nextModule = this.Modules[offset - 1];
                 else
+                    // 否, 取下一个
                     nextModule = this.Modules[offset + 1];
             }
             let active = module.IsActive;
@@ -703,10 +872,18 @@ namespace WM.Admin {
             else if (!active && nextModule) this.adjustPagebar(nextModule);
             else this.adjustPagebar();
         }
+        /**
+         * 刷新模块页
+         * @param module 指定模块页刷新
+         */
         private refreshModule(module?: ModulePageProxy): void {
             if (module == undefined) return;
             module.refresh();
         }
+        /**
+         * 查找模块页
+         * @param condition string: wmkey, JQuery|Dom: pagebarItem, pagefrmItem
+         */
         private findModule(condition: string | JQuery | HTMLElement | undefined): ModulePageProxy | undefined {
 
             let module: ModulePageProxy | undefined;
@@ -714,7 +891,7 @@ namespace WM.Admin {
             let type = TypeHelper.getType(condition);
             if (type == 'string' && $.trim(condition as string) == '') return module;
             if (type == 'string') {
-                $.each(this.Modules, function (n, o) {
+                _.each(this.Modules, (o) => {
                     if (o.Options.wmkey == $.trim(condition as string)) {
                         module = o;
                         return false;
@@ -722,7 +899,7 @@ namespace WM.Admin {
                 });
             } else {
                 let tmpElem: JQuery = $(condition as JQuery | HTMLElement);
-                $.each(this.Modules, function (n, o) {
+                _.each(this.Modules, (o) => {
                     if (tmpElem.is(o.PagebarItem as JQuery)
                         || tmpElem.is(o.PagefrmItem as JQuery)) {
                         module = o;
@@ -734,28 +911,42 @@ namespace WM.Admin {
             return module;
         }
 
+        /**
+         * 消息中心添加消息
+         * @param message 消息数据
+         */
         public addMessage(message: IMessageData) {
             this._messageCenter.add(message);
         }
+        /**
+         * 提醒中心添加提醒
+         * @param alert 提醒数据
+         */
         public addAlert(alert: IAlertData) {
             this._alertCenter.add(alert);
         }
     }
 
+    /**
+     * 模块页, 代理模式处理子页面操作
+     */
     class ModulePageProxy extends Proxy.Proxy<IModulePage> implements IModulePage {
         protected _options: IOpenModuleOptions;
         public PagebarItem?: JQuery;
         public PagefrmItem?: JQuery;
 
+        /**标签宽度 */
         public get BarWidth(): number {
             return this.PagebarItem == undefined ? 0 : (this.PagebarItem.outerWidth(true) || 0);
         }
+        /**标签位置 */
         public get BarOffsetLeft(): number {
             if (this.PagebarItem == undefined) return 0;
             let offset = this.PagebarItem.offset() as JQuery.Coordinates;
             let parentOffset = this.PagebarItem.parent().offset() as JQuery.Coordinates;;
             return offset.left - parentOffset.left;
         }
+        /**是否激活 */
         public get IsActive(): boolean {
             if (this.PagebarItem && this.PagebarItem.hasClass(ClassNames.pagebar.itemActive))
                 return true;
@@ -779,27 +970,32 @@ namespace WM.Admin {
             this.createDom();
         }
 
+        /**激活 */
         public active(): void {
             if (this.PagebarItem)
                 this.PagebarItem.addClass(ClassNames.pagebar.itemActive);
             if (this.PagefrmItem)
                 this.PagefrmItem.addClass(ClassNames.pagefrm.itemActive);
         }
+        /**取消激活 */
         public inactive(): void {
             if (this.PagebarItem)
                 this.PagebarItem.removeClass(ClassNames.pagebar.itemActive);
             if (this.PagefrmItem)
                 this.PagefrmItem.removeClass(ClassNames.pagefrm.itemActive);
         }
+        /**关闭 */
         public close(): void {
             if (this.PagebarItem)
                 this.PagebarItem.remove();
             if (this.PagefrmItem)
                 this.PagefrmItem.remove();
         }
+        /**刷新 */
         public refresh(): void {
             this.refreshMode1() || this.refreshMode2() || this.refreshMode3();
         }
+        /**刷新模式1, 子页面WM.Admin.Module.refresh() */
         private refreshMode1(): boolean {
             try {
                 this.renewReal();
@@ -810,6 +1006,7 @@ namespace WM.Admin {
                 return false;
             }
         }
+        /**刷新模式2, 子页面win.location.reload() */
         private refreshMode2(): boolean {
             try {
                 if (this.PagefrmItem && this.PagefrmItem.length > 0) {
@@ -822,6 +1019,7 @@ namespace WM.Admin {
                 return false;
             }
         }
+        /**刷新模式3, iframe.src */
         private refreshMode3(): boolean {
             try {
                 if (this.PagefrmItem && this.PagefrmItem.length > 0) {
@@ -834,6 +1032,9 @@ namespace WM.Admin {
             }
         }
 
+        /**
+         * 更新子页面代理真实对象
+         */
         private renewReal() {
             if (!this.Real.Valid && this.PagefrmItem && this.PagefrmItem.length > 0) {
                 try {
@@ -844,6 +1045,9 @@ namespace WM.Admin {
             }
         }
 
+        /**
+         * 创建HTML元素
+         */
         private createDom(): void {
             if (this.PagebarItem == undefined) {
                 let pagebar = $(Selectors.layout.pagebar);

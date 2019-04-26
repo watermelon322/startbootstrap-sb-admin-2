@@ -34,7 +34,7 @@
       </a>
       <div id="fixedMenus">
         <hr class="sidebar-divider my-0">
-        <li class="nav-item active">
+        <li class="nav-item">
           <a class="nav-link" wm-key="dashboard" href="dashboard.html">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>首页</span></a>
@@ -122,7 +122,8 @@
                     <span>没有提醒!</span>
                   </div>
                 </div>
-                <a class="dropdown-item dropdown-footer text-center small text-gray-500" href="#">查看所有提醒</a>
+                <a class="dropdown-item dropdown-footer text-center small text-gray-500" wm-module wm-key="allalerts"
+                  wm-icon="fas fa-bell" href="allalerts.html">查看所有提醒</a>
               </div>
             </li>
 
@@ -145,37 +146,40 @@
                     <span>没有最新消息!</span>
                   </div>
                 </div>
-                <a class="dropdown-item dropdown-footer text-center small text-gray-500" href="#">查看所有消息</a>
+                <a class="dropdown-item dropdown-footer text-center small text-gray-500" wm-module wm-key="allmessages"
+                  wm-icon="fas fa-envelope" href="allmessages.html">查看所有消息</a>
               </div>
             </li>
 
             <div class="topbar-divider d-none d-sm-block"></div>
 
             <!-- Nav Item - User Information -->
-            <li class="nav-item dropdown no-arrow">
-              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Valerie Luna</span>
+            <li class="wm-topbarcenter nav-item dropdown no-arrow">
+              <a class="wm-tc-shower nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">超级管理员</span>
                 <img class="img-profile rounded-circle" src="img/undraw_posting_photo.svg">
               </a>
               <!-- Dropdown - User Information -->
               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                <a class="dropdown-item" href="#">
-                  <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Profile
-                </a>
-                <a class="dropdown-item" href="#">
-                  <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Settings
-                </a>
-                <a class="dropdown-item" href="#">
-                  <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Activity Log
-                </a>
+                <div class="wm-tc-container">
+                  <a class="dropdown-item" wm-module wm-key="profile" wm-icon="fas fa-user" href="profile.html">
+                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                    个人信息
+                  </a>
+                  <a class="dropdown-item" wm-module wm-key="settings" wm-icon="fas fa-cogs" href="settings.html">
+                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                    系统设置
+                  </a>
+                  <a class="dropdown-item" wm-module wm-key="activitylog" wm-icon="fas fa-list" href="activitylog.html">
+                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                    活动记录
+                  </a>
+                </div>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" wm-trigger="click:logout" href="javascript:void(0);">
                   <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Logout
+                  退出
                 </a>
               </div>
             </li>
@@ -219,7 +223,7 @@
       <footer class="sticky-footer bg-white">
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
-            <span>Copyright &copy; Your Website 2019</span>
+            <span>Copyright &copy; Watermelon 2019 All rights reserved.</span>
           </div>
         </div>
       </footer>
@@ -236,15 +240,15 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+          <h5 class="modal-title" id="exampleModalLabel">确认退出?</h5>
           <button class="close" type="button" data-dismiss="modal">
             <span>×</span>
           </button>
         </div>
-        <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+        <div class="modal-body">点击"退出"按钮, 确认退出系统.</div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-          <a class="btn btn-primary" href="login.html">Logout</a>
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">取消</button>
+          <a class="btn btn-primary" href="login.html">退出</a>
         </div>
       </div>
     </div>
