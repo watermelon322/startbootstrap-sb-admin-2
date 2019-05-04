@@ -37,6 +37,9 @@ function modules() {
   // Bootstrap SCSS
   var bootstrapSCSS = gulp.src('./node_modules/bootstrap/scss/**/*')
     .pipe(gulp.dest('./vendor/bootstrap/scss'));
+  // Bootstrap Table
+  var bootstrapTable = gulp.src('./node_modules/bootstrap-table/dist/**/*')
+    .pipe(gulp.dest('./vendor/bootstrap-table'));
   // ChartJS
   var chartJS = gulp.src('./node_modules/chart.js/dist/*.js')
     .pipe(gulp.dest('./vendor/chart.js'));
@@ -81,7 +84,7 @@ function modules() {
       '!./node_modules/jquery/dist/core.js'
     ])
     .pipe(gulp.dest('./vendor/jquery'));
-  return merge(bootstrapJS, bootstrapSCSS, chartJS, dataTables, moment, moment_locale, lodash, fontAwesome, jquery, jqueryEasing, jquerySlimscroll);
+  return merge(bootstrapJS, bootstrapSCSS, bootstrapTable, chartJS, dataTables, moment, moment_locale, lodash, fontAwesome, jquery, jqueryEasing, jquerySlimscroll);
 }
 
 // CSS task
