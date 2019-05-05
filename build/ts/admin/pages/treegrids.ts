@@ -1,7 +1,7 @@
 /// <reference path="../module.ts"/>
 
 namespace WM.Admin {
-    export class TablesPage extends ModulePage {
+    export class TreegridsPage extends ModulePage {
 
         constructor() {
             super();
@@ -20,7 +20,8 @@ namespace WM.Admin {
                 '{"id":12,"pid":10,"status":1,"name":"修改日志","permissionValue":"open:log:edit"},' +
                 '{"id":13,"pid":10,"status":0,"name":"删除日志","permissionValue":"open:log:del"}]');
 
-            $('#bootstrapTable').bootstrapTable({
+            let $table = $('#bootstrapTable');
+            $table.bootstrapTable({
                 data: data,
                 idField: 'id',
                 columns: [
@@ -45,36 +46,27 @@ namespace WM.Admin {
                             else
                                 return '<a href="javascript:void(0);" class="btn btn-success btn-sm" role="button">启用</a>';
                         }
-                    }]
-            });
-            $('#datatables').DataTable({
-                data: data,
-                columns: [
-                    {
-                        title: 'ID',
-                        data: 'id'
-                    },
-                    {
-                        title: '父ID',
-                        data: 'pid'
-                    },
-                    {
-                        title: '名称',
-                        data: 'name'
-                    },
-                    {
-                        title: '状态',
-                        data: 'status',
-                        render: function (data, type, row, meta) {
-                            if (data == 0)
-                                return '<a href="javascript:void(0);" class="btn btn-danger btn-sm" role="button">禁用</a>';
-                            else
-                                return '<a href="javascript:void(0);" class="btn btn-success btn-sm" role="button">启用</a>';
+                    }],
+                treeShowField: 'name',
+                parentIdField: 'pid',
+                onLoadSuccess: function () {
+                    console.log('load');
+                    (<any>$table).treegrid({
+                        treeColumn: 1,
+                        onChange: function () {
+                            $table.bootstrapTable('resetWidth');
                         }
-                    }
-                ],
-                pagingType: 'full_numbers',
-                language: { url: '../../../../../js/datatables.zh-cn.json' }
+                    });
+                }
+            });
+            (<any>$table).treegrid({
+                initialState: 'collapsed',
+                treeColumn: 2,
+                expanderExpandedClass: 'glyphicon glyphicon-minus',
+                expanderCollapsedClass: 'glyphicon glyphicon-plus',
+                onChange: function () {
+                    // $table.bootstrapTable('resetWidth');
+                }
             });
         }
 
@@ -83,5 +75,5 @@ namespace WM.Admin {
         }
     }
 
-    ModuleFactory = function () { return new TablesPage(); }
+    ModuleFactory = function () { return new TreegridsPage(); }
 }

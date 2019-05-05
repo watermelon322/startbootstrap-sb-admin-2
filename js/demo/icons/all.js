@@ -2,6 +2,7 @@ var WM = WM || {};
 WM.IconFonts = WM.IconFonts || {};
 WM.IconFonts.FontAwesome = WM.IconFonts.FontAwesome || {};
 WM.IconFonts.Watermelon = WM.IconFonts.Watermelon || {};
+WM.IconFonts.Glyphicons = WM.IconFonts.Glyphicons || {};
 
 (function ($) {
     "use strict"; // Start of use strict
@@ -15,18 +16,17 @@ WM.IconFonts.Watermelon = WM.IconFonts.Watermelon || {};
             const iconObj = data[key];
             const icons = iconObj.icons;
 
-            if (iconObj.mode == 'symbol') {
-            } else if(iconObj.mode == 'fontclass' && $.trim(iconObj.css) != '') {
+            if (iconObj.mode == 'symbol') {} else if (iconObj.mode == 'fontclass' && $.trim(iconObj.css) != '') {
                 var cssElem = undefined;
-                $('link[rel=stylesheet]').each(function(n, o) {
+                $('link[rel=stylesheet]').each(function (n, o) {
                     var that = $(o);
-                    if(that.attr('href') == iconObj.css) {
+                    if (that.attr('href') == iconObj.css) {
                         cssElem = that;
                         return false;
                     }
                 });
 
-                if(!cssElem) {
+                if (!cssElem) {
                     cssElem = $('<link rel="stylesheet">').attr('href', iconObj.css);
                     $('head').append(cssElem);
                 }
@@ -86,5 +86,6 @@ WM.IconFonts.Watermelon = WM.IconFonts.Watermelon || {};
 
     makeIconViewer($('#nav-fontawesome'), WM.IconFonts.FontAwesome);
     makeIconViewer($('#nav-watermelon'), WM.IconFonts.Watermelon);
+    makeIconViewer($('#nav-glyphicon'), WM.IconFonts.Glyphicon);
 
 })(jQuery); // End of use strict

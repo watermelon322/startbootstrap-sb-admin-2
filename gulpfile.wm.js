@@ -28,6 +28,20 @@ function adminCss() {
         .pipe(gulp.dest(`${outputDest}/css`));
 }
 
+function fontCss() {
+    return gulp.src(`${inputSrc}/scss/fonts/**/*.scss`)
+        .pipe(sass())
+        .pipe(autoprefixer({
+            browsers: ['last 2 versions', 'Android >= 4.0']
+        }))
+        .pipe(gulp.dest(`${outputDest}/css/fonts`));
+}
+
+function fontRes() {
+    return gulp.src([`${inputSrc}/scss/fonts/**/*`, `!${inputSrc}/scss/fonts/**/*.scss`])
+        .pipe(gulp.dest(`${outputDest}/css/fonts`));
+}
+
 function minCss() {
     return gulp.src([`${outputDest}/css/**/*.css`, `!${outputDest}/css/**/*.min.css`])
         .pipe(sourcemaps.init())
@@ -81,7 +95,7 @@ function minJs() {
         .pipe(gulp.dest(`${outputDest}/js`))
 }
 
-var cssDev = gulp.series(adminCss);
+var cssDev = gulp.series(adminCss, fontCss, fontRes);
 var cssPro = gulp.series(cssDev, minCss);
 var js = target => gulp.series(() => frameworkJs(target), () => moduleJs(target), () => pagesJs(target));
 var jsDev = gulp.series(js('ES2015'));

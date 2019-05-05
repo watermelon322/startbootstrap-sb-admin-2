@@ -75,16 +75,31 @@ function modules() {
   // jQuery Easing
   var jqueryEasing = gulp.src('./node_modules/jquery.easing/*.js')
     .pipe(gulp.dest('./vendor/jquery-easing'));
+  // jQuery Treegrid
+  var jqueryTreegrid = gulp.src([
+      './node_modules/jquery-treegrid/js/jquery.treegrid.js',
+      './node_modules/jquery-treegrid/js/jquery.treegrid.min.js',
+      './node_modules/jquery-treegrid/css/jquery.treegrid.css'
+    ])
+    .pipe(gulp.dest('./vendor/jquery-treegrid'));
   // jQuery Slimscroll
   var jquerySlimscroll = gulp.src('./node_modules/jquery-slimscroll/*.js')
     .pipe(gulp.dest('./vendor/jquery-slimscroll'));
+  // jQuery zTree
+  var jqueryZtree = gulp.src([
+      './node_modules/ztree/js/jquery.ztree.*.js',
+      './node_modules/ztree/css/**/*',
+      '!./node_modules/ztree/css/demo.css',
+      '!./node_modules/ztree/css/**/*.less'
+    ])
+    .pipe(gulp.dest('./vendor/jquery-ztree'));
   // jQuery
   var jquery = gulp.src([
       './node_modules/jquery/dist/*',
       '!./node_modules/jquery/dist/core.js'
     ])
     .pipe(gulp.dest('./vendor/jquery'));
-  return merge(bootstrapJS, bootstrapSCSS, bootstrapTable, chartJS, dataTables, moment, moment_locale, lodash, fontAwesome, jquery, jqueryEasing, jquerySlimscroll);
+  return merge(bootstrapJS, bootstrapSCSS, bootstrapTable, chartJS, dataTables, moment, moment_locale, lodash, fontAwesome, jquery, jqueryEasing, jquerySlimscroll, jqueryZtree, jqueryTreegrid);
 }
 
 // CSS task

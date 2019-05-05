@@ -6,7 +6,7 @@ WM.IconFonts.Watermelon.Standard = {
     cls: 'wfs',
     excls: '',
     prefix: 'wf-',
-    css: '//at.alicdn.com/t/font_1143379_qdpurotiptc.css',
+    css: '//at.alicdn.com/t/font_1143379_075yat4cyrgt.css',
     js: '',
     mode: 'fontclass',
     icons: [
@@ -15,6 +15,9 @@ WM.IconFonts.Watermelon.Standard = {
         'module',
         'middleware',
         'qrcode',
-        'close'
+        'close',
+        'closeall',
+        'closeother',
+        'tree'
     ]
 };
